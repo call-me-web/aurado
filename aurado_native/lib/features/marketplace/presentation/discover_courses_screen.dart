@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'dart:ui';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DiscoverCoursesScreen extends ConsumerStatefulWidget {
@@ -225,57 +226,61 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
         separatorBuilder: (context, index) => const Gap(20),
         itemBuilder: (context, index) {
           final tenant = limitedTenants[index];
-          return Column(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.shadow.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: tenant.logoUrl != null
-                      ? ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: tenant.logoUrl!,
-                            width: 48,
-                            height: 48,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: colorScheme.surfaceContainerHighest,
-                              highlightColor: colorScheme.surface,
-                              child: Container(color: colorScheme.surface),
+          return InkWell(
+            onTap: () => context.push('/platform/${tenant.id}'),
+            borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: tenant.logoUrl != null
+                        ? ClipOval(
+                            child: CachedNetworkImage(
+                              imageUrl: tenant.logoUrl!,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: colorScheme.surfaceContainerHighest,
+                                highlightColor: colorScheme.surface,
+                                child: Container(color: colorScheme.surface),
+                              ),
                             ),
+                          )
+                        : Icon(
+                            Icons.business,
+                            color: colorScheme.onSurfaceVariant,
                           ),
-                        )
-                      : Icon(
-                          Icons.business,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                  ),
                 ),
-              ),
-              const Gap(8),
-              SizedBox(
-                width: 72,
-                child: Text(
-                  tenant.name,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                const Gap(8),
+                SizedBox(
+                  width: 72,
+                  child: Text(
+                    tenant.name,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
