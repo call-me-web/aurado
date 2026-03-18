@@ -26,6 +26,22 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
   }
 
   @override
+  Future<TenantModel?> getTenantById(String id) async {
+    final response = await _supabase
+        .from('tenants')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    if (response == null) return null;
+
+    final map = Map<String, dynamic>.from(response);
+    map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
+    map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
+    return TenantModel.fromJson(map);
+  }
+
+  @override
   Future<List<DiscoveryCourseModel>> getDiscoveryCourses({String? tenantId, String? search}) async {
     var query = _supabase.from('courses').select('''
       *,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:go_router/go_router.dart';
 
 class MarketplaceCourseCard extends StatefulWidget {
   final DiscoveryCourseModel course;
@@ -46,7 +47,9 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
     final textTheme = theme.textTheme;
 
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}');
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,

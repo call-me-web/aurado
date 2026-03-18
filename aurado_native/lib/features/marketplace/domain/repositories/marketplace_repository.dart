@@ -4,4 +4,5 @@ import 'package:aurado/features/marketplace/domain/models/discovery_course_model
 abstract class MarketplaceRepository {
   Future<List<TenantModel>> getFeaturedTenants();
   Future<List<DiscoveryCourseModel>> getDiscoveryCourses({String? tenantId, String? search});
+  Future<TenantModel?> getTenantById(String id);
 }

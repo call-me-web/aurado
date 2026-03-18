@@ -17,6 +17,8 @@ import 'package:aurado/features/sync/domain/repositories/backup_repository.dart'
 import 'package:aurado/features/sync/data/repositories/supabase_backup_repository.dart';
 import 'package:aurado/features/marketplace/domain/repositories/marketplace_repository.dart';
 import 'package:aurado/features/marketplace/data/repositories/supabase_marketplace_repository.dart';
+import 'package:aurado/features/learning/domain/repositories/curriculum_repository.dart';
+import 'package:aurado/features/learning/data/repositories/supabase_curriculum_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:aurado/core/local_storage/drift_database.dart';
 
@@ -70,7 +72,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<MarketplaceRepository>(
     () => SupabaseMarketplaceRepository(sl<SupabaseClient>()),
   );
-  
+
+  sl.registerLazySingleton<CurriculumRepository>(
+    () => SupabaseCurriculumRepository(sl<SupabaseClient>()),
+  );
+
   _registerAuth();
   debugPrint('DEBUG: Auth registered.');
 }

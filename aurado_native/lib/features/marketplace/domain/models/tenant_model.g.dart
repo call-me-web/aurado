@@ -12,6 +12,8 @@ _TenantModel _$TenantModelFromJson(Map<String, dynamic> json) => _TenantModel(
   slug: json['slug'] as String,
   logoUrl: json['logo_url'] as String?,
   coverUrl: json['cover_url'] as String?,
+  primaryColor: json['primary_color'] as String?,
+  secondaryColor: json['secondary_color'] as String?,
 );
 
 Map<String, dynamic> _$TenantModelToJson(_TenantModel instance) =>
@@ -21,4 +23,6 @@ Map<String, dynamic> _$TenantModelToJson(_TenantModel instance) =>
       'slug': instance.slug,
       'logo_url': instance.logoUrl,
       'cover_url': instance.coverUrl,
+      'primary_color': instance.primaryColor,
+      'secondary_color': instance.secondaryColor,
     };

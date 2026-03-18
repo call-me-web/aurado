@@ -15,6 +15,11 @@ class MarketplaceTenants extends _$MarketplaceTenants {
 }
 
 @riverpod
+FutureOr<TenantModel?> tenant(Ref ref, String id) {
+  return sl<MarketplaceRepository>().getTenantById(id);
+}
+
+@riverpod
 class DiscoveryCourses extends _$DiscoveryCourses {
   @override
   FutureOr<List<DiscoveryCourseModel>> build({String? tenantId}) {

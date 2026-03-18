@@ -11,6 +11,11 @@ import 'package:aurado/features/onboarding/providers/onboarding_provider.dart';
 import 'package:aurado/features/home/presentation/home_screen.dart';
 import 'package:aurado/features/marketplace/presentation/discover_courses_screen.dart';
 import 'package:aurado/features/profile/presentation/screens/profile_screen.dart';
+import 'package:aurado/features/marketplace/presentation/pages/tenant_context/platform_home_screen.dart';
+import 'package:aurado/features/marketplace/presentation/pages/tenant_context/course_detail_screen.dart';
+import 'package:aurado/features/marketplace/presentation/pages/tenant_context/curriculum_screen.dart';
+import 'package:aurado/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart';
+import 'package:aurado/features/marketplace/presentation/pages/tenant_context/leaderboard_screen.dart';
 import 'scaffold_with_nav_bar.dart';
 
 /// Centralized route name constants — avoids hardcoded path strings.
@@ -36,6 +41,7 @@ class AppRoutes {
       '/platform/:tenantId/course/:courseId/curriculum';
   static const String lesson =
       '/platform/:tenantId/course/:courseId/lesson/:lessonId';
+  static const String leaderboard = '/platform/:tenantId/leaderboard';
   static const String exam = '/platform/:tenantId/exam/:examId';
   static const String notifications = '/notifications';
 }
@@ -239,7 +245,47 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'platform',
         builder: (context, state) {
           final tenantId = state.pathParameters['tenantId']!;
-          return _PlaceholderPage(label: 'Platform: $tenantId');
+          return PlatformHomeScreen(tenantId: tenantId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.courseDetail,
+        name: 'courseDetail',
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId']!;
+          final courseId = state.pathParameters['courseId']!;
+          return CourseDetailScreen(tenantId: tenantId, courseId: courseId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.curriculum,
+        name: 'curriculum',
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId']!;
+          final courseId = state.pathParameters['courseId']!;
+          return CurriculumScreen(tenantId: tenantId, courseId: courseId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.lesson,
+        name: 'lesson',
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId']!;
+          final courseId = state.pathParameters['courseId']!;
+          final lessonId = state.pathParameters['lessonId']!;
+          return LessonPlayerScreen(
+            tenantId: tenantId,
+            courseId: courseId,
+            lessonId: lessonId,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.leaderboard,
+        name: 'leaderboard',
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId']!;
+          return LeaderboardScreen(tenantId: tenantId);
         },
       ),
     ],

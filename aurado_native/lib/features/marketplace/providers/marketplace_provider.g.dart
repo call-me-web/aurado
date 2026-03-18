@@ -55,6 +55,80 @@ abstract class _$MarketplaceTenants extends $AsyncNotifier<List<TenantModel>> {
   }
 }
 
+@ProviderFor(tenant)
+final tenantProvider = TenantFamily._();
+
+final class TenantProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<TenantModel?>,
+          TenantModel?,
+          FutureOr<TenantModel?>
+        >
+    with $FutureModifier<TenantModel?>, $FutureProvider<TenantModel?> {
+  TenantProvider._({
+    required TenantFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'tenantProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$tenantHash();
+
+  @override
+  String toString() {
+    return r'tenantProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<TenantModel?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<TenantModel?> create(Ref ref) {
+    final argument = this.argument as String;
+    return tenant(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TenantProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$tenantHash() => r'4bcace895fecf1df56e7482b5370c1915c56a51d';
+
+final class TenantFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<TenantModel?>, String> {
+  TenantFamily._()
+    : super(
+        retry: null,
+        name: r'tenantProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  TenantProvider call(String id) => TenantProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'tenantProvider';
+}
+
 @ProviderFor(DiscoveryCourses)
 final discoveryCoursesProvider = DiscoveryCoursesFamily._();
 

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TenantModel {
 
- String get id; String get name; String get slug;@JsonKey(name: 'logo_url') String? get logoUrl;@JsonKey(name: 'cover_url') String? get coverUrl;
+ String get id; String get name; String get slug;@JsonKey(name: 'logo_url') String? get logoUrl;@JsonKey(name: 'cover_url') String? get coverUrl;@JsonKey(name: 'primary_color') String? get primaryColor;@JsonKey(name: 'secondary_color') String? get secondaryColor;
 /// Create a copy of TenantModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $TenantModelCopyWith<TenantModel> get copyWith => _$TenantModelCopyWithImpl<Tena
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.primaryColor, primaryColor) || other.primaryColor == primaryColor)&&(identical(other.secondaryColor, secondaryColor) || other.secondaryColor == secondaryColor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,slug,logoUrl,coverUrl);
+int get hashCode => Object.hash(runtimeType,id,name,slug,logoUrl,coverUrl,primaryColor,secondaryColor);
 
 @override
 String toString() {
-  return 'TenantModel(id: $id, name: $name, slug: $slug, logoUrl: $logoUrl, coverUrl: $coverUrl)';
+  return 'TenantModel(id: $id, name: $name, slug: $slug, logoUrl: $logoUrl, coverUrl: $coverUrl, primaryColor: $primaryColor, secondaryColor: $secondaryColor)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $TenantModelCopyWith<$Res>  {
   factory $TenantModelCopyWith(TenantModel value, $Res Function(TenantModel) _then) = _$TenantModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String slug,@JsonKey(name: 'logo_url') String? logoUrl,@JsonKey(name: 'cover_url') String? coverUrl
+ String id, String name, String slug,@JsonKey(name: 'logo_url') String? logoUrl,@JsonKey(name: 'cover_url') String? coverUrl,@JsonKey(name: 'primary_color') String? primaryColor,@JsonKey(name: 'secondary_color') String? secondaryColor
 });
 
 
@@ -65,13 +65,15 @@ class _$TenantModelCopyWithImpl<$Res>
 
 /// Create a copy of TenantModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? slug = null,Object? logoUrl = freezed,Object? coverUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? slug = null,Object? logoUrl = freezed,Object? coverUrl = freezed,Object? primaryColor = freezed,Object? secondaryColor = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
+as String?,primaryColor: freezed == primaryColor ? _self.primaryColor : primaryColor // ignore: cast_nullable_to_non_nullable
+as String?,secondaryColor: freezed == secondaryColor ? _self.secondaryColor : secondaryColor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -157,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl, @JsonKey(name: 'primary_color')  String? primaryColor, @JsonKey(name: 'secondary_color')  String? secondaryColor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TenantModel() when $default != null:
-return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);case _:
+return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl,_that.primaryColor,_that.secondaryColor);case _:
   return orElse();
 
 }
@@ -178,10 +180,10 @@ return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl, @JsonKey(name: 'primary_color')  String? primaryColor, @JsonKey(name: 'secondary_color')  String? secondaryColor)  $default,) {final _that = this;
 switch (_that) {
 case _TenantModel():
-return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);case _:
+return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl,_that.primaryColor,_that.secondaryColor);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +200,10 @@ return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String slug, @JsonKey(name: 'logo_url')  String? logoUrl, @JsonKey(name: 'cover_url')  String? coverUrl, @JsonKey(name: 'primary_color')  String? primaryColor, @JsonKey(name: 'secondary_color')  String? secondaryColor)?  $default,) {final _that = this;
 switch (_that) {
 case _TenantModel() when $default != null:
-return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);case _:
+return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl,_that.primaryColor,_that.secondaryColor);case _:
   return null;
 
 }
@@ -213,7 +215,7 @@ return $default(_that.id,_that.name,_that.slug,_that.logoUrl,_that.coverUrl);cas
 @JsonSerializable()
 
 class _TenantModel extends TenantModel {
-  const _TenantModel({required this.id, required this.name, required this.slug, @JsonKey(name: 'logo_url') this.logoUrl, @JsonKey(name: 'cover_url') this.coverUrl}): super._();
+  const _TenantModel({required this.id, required this.name, required this.slug, @JsonKey(name: 'logo_url') this.logoUrl, @JsonKey(name: 'cover_url') this.coverUrl, @JsonKey(name: 'primary_color') this.primaryColor, @JsonKey(name: 'secondary_color') this.secondaryColor}): super._();
   factory _TenantModel.fromJson(Map<String, dynamic> json) => _$TenantModelFromJson(json);
 
 @override final  String id;
@@ -221,6 +223,8 @@ class _TenantModel extends TenantModel {
 @override final  String slug;
 @override@JsonKey(name: 'logo_url') final  String? logoUrl;
 @override@JsonKey(name: 'cover_url') final  String? coverUrl;
+@override@JsonKey(name: 'primary_color') final  String? primaryColor;
+@override@JsonKey(name: 'secondary_color') final  String? secondaryColor;
 
 /// Create a copy of TenantModel
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.primaryColor, primaryColor) || other.primaryColor == primaryColor)&&(identical(other.secondaryColor, secondaryColor) || other.secondaryColor == secondaryColor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,slug,logoUrl,coverUrl);
+int get hashCode => Object.hash(runtimeType,id,name,slug,logoUrl,coverUrl,primaryColor,secondaryColor);
 
 @override
 String toString() {
-  return 'TenantModel(id: $id, name: $name, slug: $slug, logoUrl: $logoUrl, coverUrl: $coverUrl)';
+  return 'TenantModel(id: $id, name: $name, slug: $slug, logoUrl: $logoUrl, coverUrl: $coverUrl, primaryColor: $primaryColor, secondaryColor: $secondaryColor)';
 }
 
 
@@ -255,7 +259,7 @@ abstract mixin class _$TenantModelCopyWith<$Res> implements $TenantModelCopyWith
   factory _$TenantModelCopyWith(_TenantModel value, $Res Function(_TenantModel) _then) = __$TenantModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String slug,@JsonKey(name: 'logo_url') String? logoUrl,@JsonKey(name: 'cover_url') String? coverUrl
+ String id, String name, String slug,@JsonKey(name: 'logo_url') String? logoUrl,@JsonKey(name: 'cover_url') String? coverUrl,@JsonKey(name: 'primary_color') String? primaryColor,@JsonKey(name: 'secondary_color') String? secondaryColor
 });
 
 
@@ -272,13 +276,15 @@ class __$TenantModelCopyWithImpl<$Res>
 
 /// Create a copy of TenantModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? slug = null,Object? logoUrl = freezed,Object? coverUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? slug = null,Object? logoUrl = freezed,Object? coverUrl = freezed,Object? primaryColor = freezed,Object? secondaryColor = freezed,}) {
   return _then(_TenantModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
+as String?,primaryColor: freezed == primaryColor ? _self.primaryColor : primaryColor // ignore: cast_nullable_to_non_nullable
+as String?,secondaryColor: freezed == secondaryColor ? _self.secondaryColor : secondaryColor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
