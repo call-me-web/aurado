@@ -1,0 +1,199 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'marketplace_provider.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(MarketplaceTenants)
+final marketplaceTenantsProvider = MarketplaceTenantsProvider._();
+
+final class MarketplaceTenantsProvider
+    extends $AsyncNotifierProvider<MarketplaceTenants, List<TenantModel>> {
+  MarketplaceTenantsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'marketplaceTenantsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$marketplaceTenantsHash();
+
+  @$internal
+  @override
+  MarketplaceTenants create() => MarketplaceTenants();
+}
+
+String _$marketplaceTenantsHash() =>
+    r'3b60aa7b81e06077727e10fc9874808ec9b4cf84';
+
+abstract class _$MarketplaceTenants extends $AsyncNotifier<List<TenantModel>> {
+  FutureOr<List<TenantModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<TenantModel>>, List<TenantModel>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<TenantModel>>, List<TenantModel>>,
+              AsyncValue<List<TenantModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(DiscoveryCourses)
+final discoveryCoursesProvider = DiscoveryCoursesFamily._();
+
+final class DiscoveryCoursesProvider
+    extends
+        $AsyncNotifierProvider<DiscoveryCourses, List<DiscoveryCourseModel>> {
+  DiscoveryCoursesProvider._({
+    required DiscoveryCoursesFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'discoveryCoursesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$discoveryCoursesHash();
+
+  @override
+  String toString() {
+    return r'discoveryCoursesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  DiscoveryCourses create() => DiscoveryCourses();
+
+  @override
+  bool operator ==(Object other) {
+    return other is DiscoveryCoursesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$discoveryCoursesHash() => r'5d349976a3f50890000224e9040b7ea4811528c5';
+
+final class DiscoveryCoursesFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          DiscoveryCourses,
+          AsyncValue<List<DiscoveryCourseModel>>,
+          List<DiscoveryCourseModel>,
+          FutureOr<List<DiscoveryCourseModel>>,
+          String?
+        > {
+  DiscoveryCoursesFamily._()
+    : super(
+        retry: null,
+        name: r'discoveryCoursesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  DiscoveryCoursesProvider call({String? tenantId}) =>
+      DiscoveryCoursesProvider._(argument: tenantId, from: this);
+
+  @override
+  String toString() => r'discoveryCoursesProvider';
+}
+
+abstract class _$DiscoveryCourses
+    extends $AsyncNotifier<List<DiscoveryCourseModel>> {
+  late final _$args = ref.$arg as String?;
+  String? get tenantId => _$args;
+
+  FutureOr<List<DiscoveryCourseModel>> build({String? tenantId});
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<DiscoveryCourseModel>>,
+              List<DiscoveryCourseModel>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<DiscoveryCourseModel>>,
+                List<DiscoveryCourseModel>
+              >,
+              AsyncValue<List<DiscoveryCourseModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(tenantId: _$args));
+  }
+}
+
+/// Computes the top popular categories dynamically based on fetched courses.
+
+@ProviderFor(popularCategories)
+final popularCategoriesProvider = PopularCategoriesProvider._();
+
+/// Computes the top popular categories dynamically based on fetched courses.
+
+final class PopularCategoriesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<String>>,
+          List<String>,
+          FutureOr<List<String>>
+        >
+    with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
+  /// Computes the top popular categories dynamically based on fetched courses.
+  PopularCategoriesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'popularCategoriesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$popularCategoriesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<String>> create(Ref ref) {
+    return popularCategories(ref);
+  }
+}
+
+String _$popularCategoriesHash() => r'49b984beb9a3a848b54e67c94d6c17b5df2cb0b7';
