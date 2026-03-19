@@ -36,7 +36,10 @@ class AppConstants {
   /// Offline video expiry in days (enforced client-side via HMAC envelope).
   static const int offlineExpiryDays = 7;
 
-  // ── Timeouts ─────────────────────────────────────────────
+  // ── Network ─────────────────────────────────────────────
+  static String get apiBaseUrl =>
+      dotenv.env['VITE_API_URL'] ?? 'http://localhost:3000';
+
   static const Duration networkTimeout = Duration(seconds: 30);
   static const Duration cacheStale = Duration(minutes: 15);
 }

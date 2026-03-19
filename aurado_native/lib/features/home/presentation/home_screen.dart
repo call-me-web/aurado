@@ -29,12 +29,20 @@ class HomeScreen extends ConsumerWidget {
                     _buildDailyProgress(context, data),
                     const Gap(24),
                     if (data.recentLessons.isNotEmpty) ...[
-                      _buildSectionHeader(context, 'Continue Learning', onSeeAll: () {}),
+                      _buildSectionHeader(
+                        context,
+                        'Continue Learning',
+                        onSeeAll: () {},
+                      ),
                       const Gap(12),
                       _buildContinueLearningList(context, data.recentLessons),
                       const Gap(24),
                     ],
-                    _buildSectionHeader(context, 'Discover Courses', onSeeAll: () {}),
+                    _buildSectionHeader(
+                      context,
+                      'Discover Courses',
+                      onSeeAll: () {},
+                    ),
                     const Gap(12),
                     _buildMarketplaceHighlights(context),
                     const Gap(80), // Space for bottom nav
@@ -45,12 +53,18 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, st) => Center(child: Text('Error loading dashboard: $err')),
+        error: (err, st) =>
+            Center(child: Text('Error loading dashboard: $err')),
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context, String name, AuthStateData authState, WidgetRef ref) {
+  Widget _buildAppBar(
+    BuildContext context,
+    String name,
+    AuthStateData authState,
+    WidgetRef ref,
+  ) {
     return SliverAppBar(
       expandedHeight: 180,
       pinned: true,
@@ -77,7 +91,8 @@ class HomeScreen extends ConsumerWidget {
                   color: Colors.white.withOpacity(0.1),
                 ),
               ),
-              if (authState.canRestore) _buildRestoreBanner(ref), // Added restore banner
+              if (authState.canRestore)
+                _buildRestoreBanner(ref), // Added restore banner
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -96,10 +111,7 @@ class HomeScreen extends ConsumerWidget {
                       const Gap(4),
                       const Text(
                         'আপনার লার্নিং জার্নি চালিয়ে যান',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
                       ),
                     ],
                   ),
@@ -120,21 +132,29 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildRestoreBanner(WidgetRef ref) {
-    return Positioned( // Wrapped in Positioned to place it correctly
+    return Positioned(
+      // Wrapped in Positioned to place it correctly
       top: 0,
       left: 0,
       right: 0,
       child: Container(
-        margin: const EdgeInsets.only(top: 60, left: 20, right: 20), // Adjusted margin for SafeArea
+        margin: const EdgeInsets.only(
+          top: 60,
+          left: 20,
+          right: 20,
+        ), // Adjusted margin for SafeArea
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.purple.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(7.0),
           border: Border.all(color: Colors.purple.withOpacity(0.3)),
         ),
         child: Row(
           children: [
-            HugeIcon(icon: HugeIcons.strokeRoundedDownload01, color: Colors.purple),
+            HugeIcon(
+              icon: HugeIcons.strokeRoundedDownload01,
+              color: Colors.purple,
+            ),
             const Gap(12),
             Expanded(
               child: Column(
@@ -152,7 +172,8 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             TextButton(
-              onPressed: () => ref.read(authProvider.notifier).restoreProgress(),
+              onPressed: () =>
+                  ref.read(authProvider.notifier).restoreProgress(),
               child: const Text('Restore'),
             ),
           ],
@@ -195,8 +216,18 @@ class HomeScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                const Icon(Icons.local_fire_department, color: Colors.orange, size: 30),
-                Text('${data.streakCount} দিন', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Colors.orange,
+                  size: 30,
+                ),
+                Text(
+                  '${data.streakCount} দিন',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
               ],
             ),
           ),
@@ -205,7 +236,11 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, {VoidCallback? onSeeAll}) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title, {
+    VoidCallback? onSeeAll,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -214,15 +249,15 @@ class HomeScreen extends ConsumerWidget {
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         if (onSeeAll != null)
-          TextButton(
-            onPressed: onSeeAll,
-            child: const Text('সবগুলো দেখুন'),
-          ),
+          TextButton(onPressed: onSeeAll, child: const Text('সবগুলো দেখুন')),
       ],
     );
   }
 
-  Widget _buildContinueLearningList(BuildContext context, List<RecentLesson> lessons) {
+  Widget _buildContinueLearningList(
+    BuildContext context,
+    List<RecentLesson> lessons,
+  ) {
     return SizedBox(
       height: 160,
       child: ListView.separated(
@@ -236,9 +271,11 @@ class HomeScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
-                image: lesson.thumbnailUrl.isNotEmpty 
-                  ? NetworkImage(lesson.thumbnailUrl)
-                  : const NetworkImage('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=400&auto=format&fit=crop'),
+                image: lesson.thumbnailUrl.isNotEmpty
+                    ? NetworkImage(lesson.thumbnailUrl)
+                    : const NetworkImage(
+                        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=400&auto=format&fit=crop',
+                      ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -246,7 +283,10 @@ class HomeScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
-                  colors: [Colors.black.withValues(alpha: 0.1), Colors.black.withValues(alpha: 0.8)],
+                  colors: [
+                    Colors.black.withValues(alpha: 0.1),
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -258,7 +298,11 @@ class HomeScreen extends ConsumerWidget {
                 children: [
                   Text(
                     lesson.title,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   Text(
                     '${lesson.watchPercentage}% completed',
@@ -276,13 +320,28 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildMarketplaceHighlights(BuildContext context) {
     return Column(
       children: [
-        _buildMarketplaceItem(context, 'Engineering Admission 2024', '10 Minute School', '৳ ৫০০০'),
-        _buildMarketplaceItem(context, 'HSC Batch 2025', 'Omanah School', '৳ ১৫০০'),
+        _buildMarketplaceItem(
+          context,
+          'Engineering Admission 2024',
+          '10 Minute School',
+          '৳ ৫০০০',
+        ),
+        _buildMarketplaceItem(
+          context,
+          'HSC Batch 2025',
+          'Omanah School',
+          '৳ ১৫০০',
+        ),
       ],
     );
   }
 
-  Widget _buildMarketplaceItem(BuildContext context, String title, String platform, String price) {
+  Widget _buildMarketplaceItem(
+    BuildContext context,
+    String title,
+    String platform,
+    String price,
+  ) {
     return AuradoCard(
       padding: EdgeInsets.zero,
       child: Row(
@@ -291,9 +350,14 @@ class HomeScreen extends ConsumerWidget {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), bottomLeft: Radius.circular(24)),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                bottomLeft: Radius.circular(24),
+              ),
               image: const DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1434030216411-0bb7c3f35ad7?q=80&w=200&auto=format&fit=crop'),
+                image: NetworkImage(
+                  'https://images.unsplash.com/photo-1434030216411-0bb7c3f35ad7?q=80&w=200&auto=format&fit=crop',
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -304,10 +368,25 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(platform, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    platform,
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
                   const Gap(8),
-                  Text(price, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
+                  Text(
+                    price,
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),

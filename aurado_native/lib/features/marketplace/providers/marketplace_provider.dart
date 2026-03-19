@@ -34,6 +34,21 @@ class DiscoveryCourses extends _$DiscoveryCourses {
   }
 }
 
+@riverpod
+class EnrolledCourses extends _$EnrolledCourses {
+  @override
+  FutureOr<List<DiscoveryCourseModel>> build() {
+    return sl<MarketplaceRepository>().getEnrolledCourses();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => sl<MarketplaceRepository>().getEnrolledCourses(),
+    );
+  }
+}
+
 /// Computes the top popular categories dynamically based on fetched courses.
 @riverpod
 FutureOr<List<String>> popularCategories(Ref ref) async {
@@ -63,4 +78,30 @@ FutureOr<List<String>> popularCategories(Ref ref) async {
     loading: () => [],
     error: (_, __) => [],
   );
+}
+
+@riverpod
+class EnrollmentController extends _$EnrollmentController {
+  @override
+  AsyncValue<String?> build() => const AsyncValue.data(null);
+
+  Future<void> handleEnrollment(DiscoveryCourseModel course) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repository = sl<MarketplaceRepository>();
+      
+      if (course.price <= 0) {
+        final success = await repository.enrollFree(courseId: course.id);
+        if (!success) throw Exception('Free enrollment failed');
+        ref.invalidate(enrolledCoursesProvider);
+        return 'success'; // Indicate success for free enrollment
+      } else {
+        final paymentUrl = await repository.initializePayment(
+          courseId: course.id,
+          tenantId: course.tenantId,
+        );
+        return paymentUrl; // Return the gateway URL for redirection
+      }
+    });
+  }
 }

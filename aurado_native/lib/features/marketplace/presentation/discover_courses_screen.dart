@@ -46,7 +46,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 20,
-        backgroundColor: colorScheme.surface.withValues(alpha: 0.75),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.05),
         elevation: 0,
         flexibleSpace: ClipRect(
           child: BackdropFilter(
@@ -78,7 +78,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                     decoration: InputDecoration(
                       hintText: 'Search....',
                       hintStyle: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
                       suffixIcon: Padding(
                         padding: const EdgeInsets.only(right: 4.0),

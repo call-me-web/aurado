@@ -10,16 +10,14 @@ import 'package:hugeicons/hugeicons.dart';
 class McqScreen extends ConsumerStatefulWidget {
   final String examId;
 
-  const McqScreen({
-    super.key,
-    required this.examId,
-  });
+  const McqScreen({super.key, required this.examId});
 
   @override
   ConsumerState<McqScreen> createState() => _McqScreenState();
 }
 
-class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserver {
+class _McqScreenState extends ConsumerState<McqScreen>
+    with WidgetsBindingObserver {
   int _currentQuestionIndex = 0;
   final Map<String, String> _selectedAnswers = {};
   late Timer _examTimer;
@@ -41,23 +39,30 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      ref.read(activeExamSessionProvider.notifier).recordProctoringEvent(
-        'app_backgrounded',
-        metadata: 'Question Index: $_currentQuestionIndex',
-      );
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      ref
+          .read(activeExamSessionProvider.notifier)
+          .recordProctoringEvent(
+            'app_backgrounded',
+            metadata: 'Question Index: $_currentQuestionIndex',
+          );
     }
   }
 
   Future<void> _initializeExam() async {
     final exam = await ref.read(examProvider(widget.examId).future);
     _secondsRemaining = exam.durationMinutes * 60;
-    
+
     final userId = 'student_one'; // TODO: Get from auth provider
-    await ref.read(activeExamSessionProvider.notifier).startSession(widget.examId, userId);
+    await ref
+        .read(activeExamSessionProvider.notifier)
+        .startSession(widget.examId, userId);
 
     if (exam.questions.isNotEmpty) {
-      ref.read(activeExamSessionProvider.notifier).setCurrentQuestion(exam.questions.first.id);
+      ref
+          .read(activeExamSessionProvider.notifier)
+          .setCurrentQuestion(exam.questions.first.id);
     }
 
     _examTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -74,8 +79,14 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
       setState(() {
         _currentQuestionIndex++;
       });
-      final questionId = ref.read(examProvider(widget.examId)).value!.questions[_currentQuestionIndex].id;
-      ref.read(activeExamSessionProvider.notifier).setCurrentQuestion(questionId);
+      final questionId = ref
+          .read(examProvider(widget.examId))
+          .value!
+          .questions[_currentQuestionIndex]
+          .id;
+      ref
+          .read(activeExamSessionProvider.notifier)
+          .setCurrentQuestion(questionId);
     } else {
       _showSubmitConfirmation();
     }
@@ -84,7 +95,7 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
   void _submitExam() {
     _examTimer.cancel();
     ref.read(activeExamSessionProvider.notifier).submit();
-    Navigator.pop(context); 
+    Navigator.pop(context);
   }
 
   void _showSubmitConfirmation() {
@@ -92,13 +103,21 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Submit Exam?'),
-        content: const Text('Are you sure you want to finish and submit your answers?'),
+        content: const Text(
+          'Are you sure you want to finish and submit your answers?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () {
-            Navigator.pop(context);
-            _submitExam();
-          }, child: const Text('Submit')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _submitExam();
+            },
+            child: const Text('Submit'),
+          ),
         ],
       ),
     );
@@ -124,11 +143,18 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
               ),
               child: Row(
                 children: [
-                  HugeIcon(icon: HugeIcons.strokeRoundedClock01, color: theme.colorScheme.error, size: 16),
+                  HugeIcon(
+                    icon: HugeIcons.strokeRoundedClock01,
+                    color: theme.colorScheme.error,
+                    size: 16,
+                  ),
                   const Gap(8),
                   Text(
                     _formatTime(_secondsRemaining),
-                    style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -145,7 +171,8 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
   }
 
   Widget _buildExamBody(ExamModel exam, ThemeData theme) {
-    if (exam.questions.isEmpty) return const Center(child: Text('No questions found.'));
+    if (exam.questions.isEmpty)
+      return const Center(child: Text('No questions found.'));
 
     final question = exam.questions[_currentQuestionIndex];
     final progress = (_currentQuestionIndex + 1) / exam.questions.length;
@@ -162,15 +189,22 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
             children: [
               Text(
                 'Question ${_currentQuestionIndex + 1} of ${exam.questions.length}',
-                style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
               ),
-              Text('${question.marks} Marks', style: theme.textTheme.labelMedium),
+              Text(
+                '${question.marks} Marks',
+                style: theme.textTheme.labelMedium,
+              ),
             ],
           ),
           const Gap(12),
           Text(
             question.content,
-            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           if (question.explanation != null) ...[
             const Gap(12),
@@ -190,23 +224,31 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
                     setState(() {
                       _selectedAnswers[question.id] = option.id;
                     });
-                    
-                    final answerObj = {'selected_id': option.id, 'text': option.text};
-                    ref.read(activeExamSessionProvider.notifier).updateAnswer(
-                      question.id,
-                      answerObj,
-                    );
+
+                    final answerObj = {
+                      'selected_id': option.id,
+                      'text': option.text,
+                    };
+                    ref
+                        .read(activeExamSessionProvider.notifier)
+                        .updateAnswer(question.id, answerObj);
                   },
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(7.0),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: isSelected ? theme.colorScheme.primary : theme.dividerColor,
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : theme.dividerColor,
                         width: 2,
                       ),
-                      color: isSelected ? theme.colorScheme.primaryContainer.withValues(alpha: 0.1) : null,
-                      borderRadius: BorderRadius.circular(16),
+                      color: isSelected
+                          ? theme.colorScheme.primaryContainer.withValues(
+                              alpha: 0.1,
+                            )
+                          : null,
+                      borderRadius: BorderRadius.circular(7.0),
                     ),
                     child: Row(
                       children: [
@@ -214,13 +256,18 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
                           String.fromCharCode(65 + index), // A, B, C, D
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const Gap(16),
                         Expanded(child: Text(option.text)),
                         if (isSelected)
-                          Icon(Icons.check_circle, color: theme.colorScheme.primary),
+                          Icon(
+                            Icons.check_circle,
+                            color: theme.colorScheme.primary,
+                          ),
                       ],
                     ),
                   ),
@@ -235,9 +282,15 @@ class _McqScreenState extends ConsumerState<McqScreen> with WidgetsBindingObserv
             child: ElevatedButton(
               onPressed: () => _nextQuestion(exam.questions.length),
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7.0),
+                ),
               ),
-              child: Text(_currentQuestionIndex == exam.questions.length - 1 ? 'Submit Exam' : 'Next Question'),
+              child: Text(
+                _currentQuestionIndex == exam.questions.length - 1
+                    ? 'Submit Exam'
+                    : 'Next Question',
+              ),
             ),
           ),
         ],

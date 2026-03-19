@@ -28,23 +28,36 @@ class CurriculumScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Content', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Course Content',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
-          icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.black),
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Colors.black,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
       body: curriculumAsync.when(
         data: (subjects) {
           if (subjects.isEmpty) {
-            return const Center(child: Text('No curriculum found for this course.'));
+            return const Center(
+              child: Text('No curriculum found for this course.'),
+            );
           }
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             itemCount: subjects.length,
             itemBuilder: (context, index) {
-              return _buildSubjectSection(context, subjects[index], colorScheme, textTheme);
+              return _buildSubjectSection(
+                context,
+                subjects[index],
+                colorScheme,
+                textTheme,
+              );
             },
           );
         },
@@ -73,7 +86,10 @@ class CurriculumScreen extends ConsumerWidget {
             ),
           ),
         ),
-        ...subject.chapters.map((chapter) => _buildChapterTile(context, chapter, colorScheme, textTheme)),
+        ...subject.chapters.map(
+          (chapter) =>
+              _buildChapterTile(context, chapter, colorScheme, textTheme),
+        ),
         const Gap(24),
       ],
     );
@@ -89,7 +105,7 @@ class CurriculumScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(7.0),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: ExpansionTile(
@@ -104,7 +120,10 @@ class CurriculumScreen extends ConsumerWidget {
           style: textTheme.bodySmall,
         ),
         children: chapter.lessons
-            .map((lesson) => _buildLessonItem(context, lesson, colorScheme, textTheme))
+            .map(
+              (lesson) =>
+                  _buildLessonItem(context, lesson, colorScheme, textTheme),
+            )
             .toList(),
       ),
     );
@@ -120,15 +139,21 @@ class CurriculumScreen extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        context.push('/platform/$tenantId/course/$courseId/lesson/${lesson.id}');
+        context.push(
+          '/platform/$tenantId/course/$courseId/lesson/${lesson.id}',
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Row(
           children: [
             HugeIcon(
-              icon: isVideo ? HugeIcons.strokeRoundedPlayCircle : HugeIcons.strokeRoundedFile01,
-              color: lesson.isCompleted ? Colors.green : colorScheme.onSurfaceVariant,
+              icon: isVideo
+                  ? HugeIcons.strokeRoundedPlayCircle
+                  : HugeIcons.strokeRoundedFile01,
+              color: lesson.isCompleted
+                  ? Colors.green
+                  : colorScheme.onSurfaceVariant,
               size: 20,
             ),
             const Gap(16),
@@ -139,7 +164,9 @@ class CurriculumScreen extends ConsumerWidget {
                   Text(
                     lesson.title,
                     style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: lesson.isCompleted ? FontWeight.normal : FontWeight.w500,
+                      fontWeight: lesson.isCompleted
+                          ? FontWeight.normal
+                          : FontWeight.w500,
                     ),
                   ),
                   Text(
@@ -150,9 +177,17 @@ class CurriculumScreen extends ConsumerWidget {
               ),
             ),
             if (lesson.isCompleted)
-              const HugeIcon(icon: HugeIcons.strokeRoundedCheckmarkCircle02, color: Colors.green, size: 16)
+              const HugeIcon(
+                icon: HugeIcons.strokeRoundedCheckmarkCircle02,
+                color: Colors.green,
+                size: 16,
+              )
             else
-              const HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, size: 14, color: Colors.grey),
+              const HugeIcon(
+                icon: HugeIcons.strokeRoundedArrowRight01,
+                size: 14,
+                color: Colors.grey,
+              ),
           ],
         ),
       ),
