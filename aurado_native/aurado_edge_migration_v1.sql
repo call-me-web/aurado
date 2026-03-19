@@ -156,3 +156,48 @@ using (
   bucket_id = 'backups' AND
   (storage.foldername(name))[1] = auth.uid()::text
 );
+
+
+
+
+
+
+-- 1. Proctoring Logs (Anti-Cheating)
+-- Ties into your existing `exam_attempts` table safely
+CREATE TABLE public.proctoring_logs (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  attempt_id uuid not null,
+  event_type text not null,
+  metadata text null,
+  timestamp timestamp with time zone null default now(),
+  created_at timestamp with time zone null default now(),
+  constraint proctoring_logs_pkey primary key (id),
+  constraint proctoring_logs_attempt_id_fkey foreign KEY (attempt_id) references exam_attempts (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_proctoring_logs_attempt_id on public.proctoring_logs using btree (attempt_id) TABLESPACE pg_default;
+
+
+-- 2. Add Unique Constraint to your existing question_responses table
+-- This is necessary for the upsert logic to work cleanly without creating duplicate rows
+ALTER TABLE public.question_responses 
+  ADD CONSTRAINT unique_attempt_question UNIQUE (attempt_id, question_id);
+
+
+-- 3. The FUTURE-PROOF RPC Function (Idempotent approach)
+-- Safe for mobile devices on flaky networks.
+CREATE OR REPLACE FUNCTION upsert_exam_engagement(
+    p_attempt_id UUID,
+    p_question_id UUID,
+    p_total_time_spent_ms INT
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO public.question_responses (attempt_id, question_id, time_spent_ms)
+    VALUES (p_attempt_id, p_question_id, p_total_time_spent_ms)
+    ON CONFLICT (attempt_id, question_id) 
+    DO UPDATE SET 
+      -- Only update if the incoming total time is greater than what already exists in the DB
+      time_spent_ms = GREATEST(public.question_responses.time_spent_ms, p_total_time_spent_ms),
+      updated_at = now();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
