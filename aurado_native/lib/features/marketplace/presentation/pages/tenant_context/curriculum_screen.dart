@@ -1,3 +1,4 @@
+import 'package:aurado/features/learning/domain/models/subject_model.dart';
 import 'package:aurado/features/learning/domain/models/chapter_model.dart';
 import 'package:aurado/features/learning/domain/models/lesson_model.dart';
 import 'package:aurado/features/learning/presentation/providers/learning_provider.dart';
@@ -27,23 +28,23 @@ class CurriculumScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Content'),
+        title: const Text('Course Content', style: TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.black),
           onPressed: () => context.pop(),
         ),
       ),
       body: curriculumAsync.when(
-        data: (chapters) {
-          if (chapters.isEmpty) {
+        data: (subjects) {
+          if (subjects.isEmpty) {
             return const Center(child: Text('No curriculum found for this course.'));
           }
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            itemCount: chapters.length,
+            itemCount: subjects.length,
             itemBuilder: (context, index) {
-              return _buildChapterTile(context, chapters[index], colorScheme, textTheme);
+              return _buildSubjectSection(context, subjects[index], colorScheme, textTheme);
             },
           );
         },
@@ -53,9 +54,9 @@ class CurriculumScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildChapterTile(
+  Widget _buildSubjectSection(
     BuildContext context,
-    ChapterModel chapter,
+    SubjectModel subject,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
@@ -64,40 +65,48 @@ class CurriculumScreen extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    '${chapter.orderIndex + 1}',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const Gap(12),
-              Expanded(
-                child: Text(
-                  chapter.title,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+          child: Text(
+            subject.title,
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: colorScheme.primary,
+            ),
           ),
         ),
-        ...chapter.lessons.map((lesson) => _buildLessonItem(context, lesson, colorScheme, textTheme)),
-        const Divider(height: 32),
+        ...subject.chapters.map((chapter) => _buildChapterTile(context, chapter, colorScheme, textTheme)),
+        const Gap(24),
       ],
+    );
+  }
+
+  Widget _buildChapterTile(
+    BuildContext context,
+    ChapterModel chapter,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: ExpansionTile(
+        shape: const RoundedRectangleBorder(side: BorderSide.none),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        title: Text(
+          chapter.title,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${chapter.lessons.length} Lessons',
+          style: textTheme.bodySmall,
+        ),
+        children: chapter.lessons
+            .map((lesson) => _buildLessonItem(context, lesson, colorScheme, textTheme))
+            .toList(),
+      ),
     );
   }
 
@@ -107,16 +116,14 @@ class CurriculumScreen extends ConsumerWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    final isVideo = lesson.contentType.toLowerCase() == 'video';
-    
+    final isVideo = lesson.lessonType.toLowerCase() == 'video';
+
     return InkWell(
       onTap: () {
-        // Navigate to Lesson Player
         context.push('/platform/$tenantId/course/$courseId/lesson/${lesson.id}');
       },
-      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Row(
           children: [
             HugeIcon(
@@ -133,21 +140,19 @@ class CurriculumScreen extends ConsumerWidget {
                     lesson.title,
                     style: textTheme.bodyMedium?.copyWith(
                       fontWeight: lesson.isCompleted ? FontWeight.normal : FontWeight.w500,
-                      decoration: lesson.isCompleted ? TextDecoration.lineThrough : null,
                     ),
                   ),
-                  if (isVideo)
-                    Text(
-                      'Video Lesson',
-                      style: textTheme.bodySmall?.copyWith(fontSize: 10),
-                    ),
+                  Text(
+                    isVideo ? 'Video Lesson' : 'Resource',
+                    style: textTheme.bodySmall?.copyWith(fontSize: 10),
+                  ),
                 ],
               ),
             ),
             if (lesson.isCompleted)
-              const Icon(Icons.check_circle, color: Colors.green, size: 16)
+              const HugeIcon(icon: HugeIcons.strokeRoundedCheckmarkCircle02, color: Colors.green, size: 16)
             else
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+              const HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, size: 14, color: Colors.grey),
           ],
         ),
       ),

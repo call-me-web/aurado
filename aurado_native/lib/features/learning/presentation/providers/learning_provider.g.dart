@@ -15,13 +15,13 @@ final curriculumProvider = CurriculumFamily._();
 final class CurriculumProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<ChapterModel>>,
-          List<ChapterModel>,
-          FutureOr<List<ChapterModel>>
+          AsyncValue<List<SubjectModel>>,
+          List<SubjectModel>,
+          FutureOr<List<SubjectModel>>
         >
     with
-        $FutureModifier<List<ChapterModel>>,
-        $FutureProvider<List<ChapterModel>> {
+        $FutureModifier<List<SubjectModel>>,
+        $FutureProvider<List<SubjectModel>> {
   CurriculumProvider._({
     required CurriculumFamily super.from,
     required String super.argument,
@@ -45,12 +45,12 @@ final class CurriculumProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<ChapterModel>> $createElement(
+  $FutureProviderElement<List<SubjectModel>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<ChapterModel>> create(Ref ref) {
+  FutureOr<List<SubjectModel>> create(Ref ref) {
     final argument = this.argument as String;
     return curriculum(ref, argument);
   }
@@ -66,10 +66,10 @@ final class CurriculumProvider
   }
 }
 
-String _$curriculumHash() => r'99def04dfe30c75a02030628e8d937d8b3cb8fcc';
+String _$curriculumHash() => r'610c71ee66ae58af15813d0ce2681c8db64dd93e';
 
 final class CurriculumFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<ChapterModel>>, String> {
+    with $FunctionalFamilyOverride<FutureOr<List<SubjectModel>>, String> {
   CurriculumFamily._()
     : super(
         retry: null,

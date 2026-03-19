@@ -5,7 +5,7 @@ part 'chapter_model.freezed.dart';
 part 'chapter_model.g.dart';
 
 @freezed
-class ChapterModel with _$ChapterModel {
+abstract class ChapterModel with _$ChapterModel {
   const factory ChapterModel({
     required String id,
     @JsonKey(name: 'subject_id') String? subjectId,
