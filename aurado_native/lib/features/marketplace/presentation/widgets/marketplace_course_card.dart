@@ -25,10 +25,10 @@ class MarketplaceCourseCard extends StatefulWidget {
 }
 
 class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
-
   String _formatPrice() {
     if (widget.course.price <= 0) return 'Free';
-    final hasDecimals = widget.course.price.truncateToDouble() != widget.course.price;
+    final hasDecimals =
+        widget.course.price.truncateToDouble() != widget.course.price;
     final priceStr = widget.course.price.toStringAsFixed(hasDecimals ? 2 : 0);
     return '${widget.course.currency} $priceStr';
   }
@@ -48,7 +48,9 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
 
     return GestureDetector(
       onTap: () {
-        context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}');
+        context.push(
+          '/platform/${widget.course.tenantId}/course/${widget.course.id}',
+        );
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -56,10 +58,10 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
         width: 340,
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(9.0),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-            width: 1, // Softer border size
+            width: 2, // Softer border size
           ),
           boxShadow: [
             BoxShadow(
@@ -70,7 +72,7 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(7.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -153,7 +155,9 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: isDark ? Colors.black.withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.95),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.85)
+                    : Colors.white.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -203,7 +207,11 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                       ? CachedNetworkImageProvider(widget.course.tenantLogoUrl!)
                       : null,
                   child: widget.course.tenantLogoUrl == null
-                      ? Icon(Icons.business, size: 12, color: colorScheme.onSurfaceVariant)
+                      ? Icon(
+                          Icons.business,
+                          size: 12,
+                          color: colorScheme.onSurfaceVariant,
+                        )
                       : null,
                 ),
               ),
@@ -240,11 +248,26 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               if (widget.course.level != null)
-                _buildMetaItem(Icons.bar_chart_rounded, widget.course.level!, colorScheme, textTheme),
+                _buildMetaItem(
+                  Icons.bar_chart_rounded,
+                  widget.course.level!,
+                  colorScheme,
+                  textTheme,
+                ),
               if (widget.course.duration != null)
-                _buildMetaItem(Icons.access_time_rounded, widget.course.duration!, colorScheme, textTheme),
+                _buildMetaItem(
+                  Icons.access_time_rounded,
+                  widget.course.duration!,
+                  colorScheme,
+                  textTheme,
+                ),
               if (widget.course.language != null)
-                _buildMetaItem(Icons.language_rounded, widget.course.language!, colorScheme, textTheme),
+                _buildMetaItem(
+                  Icons.language_rounded,
+                  widget.course.language!,
+                  colorScheme,
+                  textTheme,
+                ),
             ],
           ),
           const Gap(16),
@@ -282,12 +305,11 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                   child: Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: colorScheme.primary,
-                    size: 28, // slightly larger, visually more impactful since there's no background box anymore
+                    size:
+                        28, // slightly larger, visually more impactful since there's no background box anymore
                   ),
                 ),
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                ),
+                style: IconButton.styleFrom(padding: const EdgeInsets.all(8)),
               ),
             ],
           ),
@@ -296,7 +318,12 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
     );
   }
 
-  Widget _buildMetaItem(IconData icon, String label, ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildMetaItem(
+    IconData icon,
+    String label,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -317,7 +344,11 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
     );
   }
 
-  Widget _buildExpandableContent(ThemeData theme, ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildExpandableContent(
+    ThemeData theme,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return ClipRect(
       child: AnimatedAlign(
         duration: const Duration(milliseconds: 300),
@@ -326,18 +357,17 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
         heightFactor: widget.isExpanded ? 1.0 : 0.0,
         child: Container(
           decoration: BoxDecoration(
-            color: colorScheme.brightness == Brightness.dark 
+            color: colorScheme.brightness == Brightness.dark
                 ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
                 : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            border: Border(
-              top: BorderSide(color: theme.dividerColor),
-            ),
+            border: Border(top: BorderSide(color: theme.dividerColor)),
           ),
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.course.description != null && widget.course.description!.isNotEmpty) ...[
+              if (widget.course.description != null &&
+                  widget.course.description!.isNotEmpty) ...[
                 _buildSectionTitle('About this course', textTheme),
                 const Gap(8),
                 Text(
@@ -349,68 +379,76 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                 ),
                 const Gap(20),
               ],
-              
+
               if (widget.course.whatYouWillLearn.isNotEmpty) ...[
                 _buildSectionTitle('What you will learn', textTheme),
                 const Gap(10),
-                ...widget.course.whatYouWillLearn.take(4).map((item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            size: 18,
-                            color: Colors.green.shade600,
-                          ),
-                          const Gap(10),
-                          Expanded(
-                            child: Text(
-                              item,
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurface,
-                                height: 1.4,
+                ...widget.course.whatYouWillLearn
+                    .take(4)
+                    .map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              size: 18,
+                              color: Colors.green.shade600,
+                            ),
+                            const Gap(10),
+                            Expanded(
+                              child: Text(
+                                item,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  height: 1.4,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    )),
+                    ),
                 const Gap(10),
               ],
 
               if (widget.course.requirements.isNotEmpty) ...[
                 _buildSectionTitle('Requirements', textTheme),
                 const Gap(10),
-                ...widget.course.requirements.take(3).map((item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Icon(
-                              Icons.circle,
-                              size: 6,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const Gap(12),
-                          Expanded(
-                            child: Text(
-                              item,
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurface,
-                                height: 1.4,
+                ...widget.course.requirements
+                    .take(3)
+                    .map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Icon(
+                                Icons.circle,
+                                size: 6,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
-                          ),
-                        ],
+                            const Gap(12),
+                            Expanded(
+                              child: Text(
+                                item,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    )),
+                    ),
                 const Gap(10),
               ],
-              
+
               if (widget.course.learningMaterials.isNotEmpty) ...[
                 _buildSectionTitle('Includes', textTheme),
                 const Gap(10),
@@ -419,17 +457,21 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                   runSpacing: 10,
                   children: widget.course.learningMaterials.map((material) {
                     final lower = material.toLowerCase();
-                    IconData mIcon = Icons.library_books_rounded; // Default fallback
-                    
+                    IconData mIcon =
+                        Icons.library_books_rounded; // Default fallback
+
                     if (lower.contains('video') || lower.contains('mp4')) {
                       mIcon = Icons.play_circle_outline_rounded;
-                    } else if (lower.contains('pdf') || lower.contains('reading')) {
+                    } else if (lower.contains('pdf') ||
+                        lower.contains('reading')) {
                       mIcon = Icons.picture_as_pdf_outlined;
-                    } else if (lower.contains('quiz') || lower.contains('exam')) {
+                    } else if (lower.contains('quiz') ||
+                        lower.contains('exam')) {
                       mIcon = Icons.quiz_outlined;
                     } else if (lower.contains('certificate')) {
                       mIcon = Icons.emoji_events_outlined;
-                    } else if (lower.contains('audio') || lower.contains('podcast')) {
+                    } else if (lower.contains('audio') ||
+                        lower.contains('podcast')) {
                       mIcon = Icons.headphones_outlined;
                     } else if (lower.contains('download')) {
                       mIcon = Icons.file_download_outlined;
@@ -438,7 +480,11 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(mIcon, size: 16, color: colorScheme.onSurfaceVariant),
+                        Icon(
+                          mIcon,
+                          size: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                         const Gap(6),
                         Flexible(
                           child: Text(
@@ -454,7 +500,7 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                 ),
                 const Gap(24),
               ],
-              
+
               // Call to Action
               SizedBox(
                 width: double.infinity,

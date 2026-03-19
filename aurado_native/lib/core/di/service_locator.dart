@@ -72,7 +72,7 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<MarketplaceRepository>(
-    () => SupabaseMarketplaceRepository(sl<SupabaseClient>()),
+    () => SupabaseMarketplaceRepository(sl<SupabaseClient>(), sl<DioClient>().instance),
   );
 
   sl.registerLazySingleton<CurriculumRepository>(

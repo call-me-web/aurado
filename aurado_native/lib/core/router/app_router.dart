@@ -18,6 +18,7 @@ import 'package:aurado/features/marketplace/presentation/pages/tenant_context/le
 import 'package:aurado/features/marketplace/presentation/pages/tenant_context/leaderboard_screen.dart';
 import 'package:aurado/features/exams/presentation/pages/mcq_screen.dart';
 import 'package:aurado/features/exams/presentation/pages/cq_screen.dart';
+import 'package:aurado/features/marketplace/presentation/my_courses_screen.dart';
 import 'scaffold_with_nav_bar.dart';
 
 /// Centralized route name constants — avoids hardcoded path strings.
@@ -217,8 +218,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.myCourses,
                 name: 'myCourses',
-                builder: (context, state) =>
-                    const _PlaceholderPage(label: 'My Courses'),
+                builder: (context, state) => const MyCoursesScreen(),
               ),
             ],
           ),

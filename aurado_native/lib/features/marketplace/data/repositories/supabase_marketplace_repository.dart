@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:aurado/core/constants/app_constants.dart';
 import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
 import 'package:aurado/features/marketplace/domain/models/tenant_model.dart';
@@ -7,8 +8,67 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseMarketplaceRepository implements MarketplaceRepository {
   final SupabaseClient _supabase;
+  final Dio _dio;
 
-  SupabaseMarketplaceRepository(this._supabase);
+  SupabaseMarketplaceRepository(this._supabase, this._dio);
+
+  @override
+  Future<String> initializePayment({
+    required String courseId,
+    required String tenantId,
+    String? provider,
+  }) async {
+    try {
+      final session = _supabase.auth.currentSession;
+      if (session == null) throw Exception('User not authenticated');
+
+      final response = await _dio.post(
+        '${AppConstants.apiBaseUrl}/api/payment/init',
+        data: {
+          'courseId': courseId,
+          'tenantId': tenantId,
+          'type': 'course_purchase',
+          'provider': provider ?? 'sslcommerz',
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${session.accessToken}',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['paymentUrl'] != null) {
+        return response.data['paymentUrl'] as String;
+      }
+      throw Exception(response.data['error'] ?? 'Failed to initialize payment');
+    } catch (e) {
+      debugPrint('initializePayment Error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> enrollFree({required String courseId}) async {
+    try {
+      final session = _supabase.auth.currentSession;
+      if (session == null) throw Exception('User not authenticated');
+
+      final response = await _dio.post(
+        '${AppConstants.apiBaseUrl}/api/course/enroll-free',
+        data: {'courseId': courseId},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${session.accessToken}',
+          },
+        ),
+      );
+
+      return response.statusCode == 200 && response.data['success'] == true;
+    } catch (e) {
+      debugPrint('enrollFree Error: $e');
+      rethrow;
+    }
+  }
 
   @override
   Future<List<TenantModel>> getFeaturedTenants() async {
@@ -84,6 +144,44 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
       
       return DiscoveryCourseModel.fromJson(map);
     }).toList();
+  }
+
+  @override
+  Future<List<DiscoveryCourseModel>> getEnrolledCourses() async {
+    try {
+      debugPrint('SupabaseMarketplaceRepository: getEnrolledCourses called');
+      final session = _supabase.auth.currentSession;
+      if (session == null) throw Exception('User not authenticated');
+
+      final response = await _dio.get(
+        '${AppConstants.apiBaseUrl}/api/course/my-courses',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${session.accessToken}',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) {
+          final Map<String, dynamic> map = Map<String, dynamic>.from(json);
+          // Normalize URLs
+          map['thumbnail_url'] = _normalizeR2Url(map['thumbnail_url'] as String?);
+          map['tenant_logo_url'] = _normalizeR2Url(map['tenant_logo_url'] as String?);
+
+          if (map['price'] != null) {
+            map['price'] = (map['price'] as num).toDouble();
+          }
+
+          return DiscoveryCourseModel.fromJson(map);
+        }).toList();
+      }
+      throw Exception('Failed to fetch enrolled courses');
+    } catch (e) {
+      debugPrint('getEnrolledCourses Error: $e');
+      rethrow;
+    }
   }
 
   /// Base URL for the public R2 platform-assets bucket.

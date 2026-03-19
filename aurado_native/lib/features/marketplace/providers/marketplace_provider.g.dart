@@ -228,6 +228,60 @@ abstract class _$DiscoveryCourses
   }
 }
 
+@ProviderFor(EnrolledCourses)
+final enrolledCoursesProvider = EnrolledCoursesProvider._();
+
+final class EnrolledCoursesProvider
+    extends
+        $AsyncNotifierProvider<EnrolledCourses, List<DiscoveryCourseModel>> {
+  EnrolledCoursesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'enrolledCoursesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$enrolledCoursesHash();
+
+  @$internal
+  @override
+  EnrolledCourses create() => EnrolledCourses();
+}
+
+String _$enrolledCoursesHash() => r'ff7cb5b91442d263956674703be0f0d7274f1299';
+
+abstract class _$EnrolledCourses
+    extends $AsyncNotifier<List<DiscoveryCourseModel>> {
+  FutureOr<List<DiscoveryCourseModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<DiscoveryCourseModel>>,
+              List<DiscoveryCourseModel>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<DiscoveryCourseModel>>,
+                List<DiscoveryCourseModel>
+              >,
+              AsyncValue<List<DiscoveryCourseModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Computes the top popular categories dynamically based on fetched courses.
 
 @ProviderFor(popularCategories)
@@ -271,3 +325,56 @@ final class PopularCategoriesProvider
 }
 
 String _$popularCategoriesHash() => r'49b984beb9a3a848b54e67c94d6c17b5df2cb0b7';
+
+@ProviderFor(EnrollmentController)
+final enrollmentControllerProvider = EnrollmentControllerProvider._();
+
+final class EnrollmentControllerProvider
+    extends $NotifierProvider<EnrollmentController, AsyncValue<String?>> {
+  EnrollmentControllerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'enrollmentControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$enrollmentControllerHash();
+
+  @$internal
+  @override
+  EnrollmentController create() => EnrollmentController();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<String?> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<String?>>(value),
+    );
+  }
+}
+
+String _$enrollmentControllerHash() =>
+    r'9957a7364ad594359853d026972433fdbede8597';
+
+abstract class _$EnrollmentController extends $Notifier<AsyncValue<String?>> {
+  AsyncValue<String?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<String?>, AsyncValue<String?>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<String?>, AsyncValue<String?>>,
+              AsyncValue<String?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

@@ -43,9 +43,9 @@ class ThemeConfig {
   static const Color info = Color(0xFF2196F3);
   static const Color navBarActive = Color.fromARGB(
     255,
-    250,
-    121,
-    61,
+    174,
+    98,
+    255,
   ); // Coral/Peach from reference
   static const double navBarGlassOpacity = 0.7;
   static const double navBarBlur = 15.0;
@@ -64,11 +64,11 @@ class ThemeConfig {
   /// Global border radii for different UI components.
   static const double radiusSm = 8.0;
   static const double radiusMd = 12.0; // Buttons, Inputs
-  static const double radiusLg = 16.0; // Cards, Dialogs
+  static const double radiusLg = 17.0; // Cards, Dialogs
   static const double radiusXl = 24.0; // Bottom Sheets
   static const double radiusFull = 999.0; // Pills, Badges
 
   /// Global stroke/border widths.
-  static const double strokeWidthThin = 1.0;
+  static const double strokeWidthThin = 1.5;
   static const double strokeWidthThick = 2.0;
 }

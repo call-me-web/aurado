@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CourseDetailScreen extends ConsumerWidget {
   final String tenantId;
@@ -23,6 +24,39 @@ class CourseDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+
+    // Listen to enrollment status
+    ref.listen(enrollmentControllerProvider, (previous, next) {
+      next.when(
+        data: (urlOrStatus) {
+          if (urlOrStatus == 'success') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Succesfully enrolled!')),
+            );
+            context.pushReplacement('/platform/$tenantId/course/$courseId/curriculum');
+          } else if (urlOrStatus != null) {
+            // It's a payment URL
+            launchUrl(Uri.parse(urlOrStatus), mode: LaunchMode.externalApplication);
+          }
+        },
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $err'), backgroundColor: colorScheme.error),
+          );
+        },
+        loading: () {},
+      );
+    });
+
+    final enrollmentState = ref.watch(enrollmentControllerProvider);
+    final enrolledCoursesAsync = ref.watch(enrolledCoursesProvider);
+    final isLoading = enrollmentState.isLoading;
+
+    final isEnrolled = enrolledCoursesAsync.when(
+      data: (courses) => courses.any((c) => c.id == courseId),
+      loading: () => false,
+      error: (_, __) => false,
+    );
 
     return coursesAsync.when(
       data: (courses) {
@@ -60,7 +94,15 @@ class CourseDetailScreen extends ConsumerWidget {
               ),
             ],
           ),
-          bottomSheet: _buildBottomActionBar(context, course, colorScheme, textTheme),
+          bottomSheet: _buildBottomActionBar(
+            context,
+            course,
+            colorScheme,
+            textTheme,
+            ref,
+            isLoading,
+            isEnrolled,
+          ),
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -229,8 +271,18 @@ class CourseDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomActionBar(BuildContext context, DiscoveryCourseModel course, ColorScheme colorScheme, TextTheme textTheme) {
-    final priceStr = course.price <= 0 ? 'Free' : '${course.currency} ${course.price.toStringAsFixed(0)}';
+  Widget _buildBottomActionBar(
+    BuildContext context,
+    DiscoveryCourseModel course,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    WidgetRef ref,
+    bool isLoading,
+    bool isEnrolled,
+  ) {
+    final priceStr = course.price <= 0
+        ? 'Free'
+        : '${course.currency} ${course.price.toStringAsFixed(0)}';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -255,11 +307,30 @@ class CourseDetailScreen extends ConsumerWidget {
             const Gap(24),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement enrollment/purchase logic
-                  context.push('/platform/$tenantId/course/${course.id}/curriculum');
-                },
-                child: const Text('Enroll Now'),
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        if (isEnrolled) {
+                          context.push(
+                            '/platform/$tenantId/course/$courseId/curriculum',
+                          );
+                        } else {
+                          ref
+                              .read(enrollmentControllerProvider.notifier)
+                              .handleEnrollment(course);
+                        }
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        isEnrolled
+                            ? 'Continue Learning'
+                            : (course.price <= 0 ? 'Enroll Now' : 'Buy Now'),
+                      ),
               ),
             ),
           ],

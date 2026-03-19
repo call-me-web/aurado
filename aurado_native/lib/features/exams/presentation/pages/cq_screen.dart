@@ -11,10 +11,7 @@ import 'package:gap/gap.dart';
 class CqScreen extends ConsumerStatefulWidget {
   final String examId;
 
-  const CqScreen({
-    super.key,
-    required this.examId,
-  });
+  const CqScreen({super.key, required this.examId});
 
   @override
   ConsumerState<CqScreen> createState() => _CqScreenState();
@@ -35,11 +32,15 @@ class _CqScreenState extends ConsumerState<CqScreen> {
   Future<void> _initializeExam() async {
     final exam = await ref.read(examProvider(widget.examId).future);
     final userId = 'student_one'; // TODO: Auth state
-    await ref.read(activeExamSessionProvider.notifier).startSession(widget.examId, userId);
+    await ref
+        .read(activeExamSessionProvider.notifier)
+        .startSession(widget.examId, userId);
 
     final cqQuestions = exam.questions.where((q) => q.type == 'cq').toList();
     if (cqQuestions.isNotEmpty) {
-      ref.read(activeExamSessionProvider.notifier).setCurrentQuestion(cqQuestions.first.id);
+      ref
+          .read(activeExamSessionProvider.notifier)
+          .setCurrentQuestion(cqQuestions.first.id);
     }
   }
 
@@ -72,13 +73,14 @@ class _CqScreenState extends ConsumerState<CqScreen> {
       );
 
       // Now attach it to the provider (which handles the upsert to DB)
-      await ref.read(activeExamSessionProvider.notifier).attachCqImage(questionId, url);
-
+      await ref
+          .read(activeExamSessionProvider.notifier)
+          .attachCqImage(questionId, url);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _isUploading = false);
@@ -92,14 +94,16 @@ class _CqScreenState extends ConsumerState<CqScreen> {
       });
       final exam = ref.read(examProvider(widget.examId)).value!;
       final cqQuestions = exam.questions.where((q) => q.type == 'cq').toList();
-      ref.read(activeExamSessionProvider.notifier).setCurrentQuestion(cqQuestions[_currentQuestionIndex].id);
+      ref
+          .read(activeExamSessionProvider.notifier)
+          .setCurrentQuestion(cqQuestions[_currentQuestionIndex].id);
     } else {
       // Submit
       ref.read(activeExamSessionProvider.notifier).submit();
       Navigator.pop(context);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final examAsync = ref.watch(examProvider(widget.examId));
@@ -132,10 +136,15 @@ class _CqScreenState extends ConsumerState<CqScreen> {
           const Gap(16),
           Text(
             question.content,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const Gap(24),
-          Text('Upload your handwritten answer:', style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            'Upload your handwritten answer:',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           const Gap(16),
           _buildImageGrid(question.id),
           const Spacer(),
@@ -154,9 +163,13 @@ class _CqScreenState extends ConsumerState<CqScreen> {
             height: 56,
             child: TextButton(
               onPressed: () => _nextQuestion(questions.length),
-              child: Text(_currentQuestionIndex == questions.length - 1 ? 'Finish & Submit' : 'Next Question'),
+              child: Text(
+                _currentQuestionIndex == questions.length - 1
+                    ? 'Finish & Submit'
+                    : 'Next Question',
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -169,7 +182,7 @@ class _CqScreenState extends ConsumerState<CqScreen> {
         height: 200,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300, width: 2),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(7.0),
         ),
         child: const Center(child: Text('No photos yet')),
       );
@@ -185,7 +198,12 @@ class _CqScreenState extends ConsumerState<CqScreen> {
             padding: const EdgeInsets.only(right: 12),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(images[index], width: 150, height: 200, fit: BoxFit.cover),
+              child: Image.file(
+                images[index],
+                width: 150,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
             ),
           );
         },
