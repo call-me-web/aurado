@@ -16,6 +16,8 @@ import 'package:aurado/features/marketplace/presentation/pages/tenant_context/co
 import 'package:aurado/features/marketplace/presentation/pages/tenant_context/curriculum_screen.dart';
 import 'package:aurado/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart';
 import 'package:aurado/features/marketplace/presentation/pages/tenant_context/leaderboard_screen.dart';
+import 'package:aurado/features/exams/presentation/pages/mcq_screen.dart';
+import 'package:aurado/features/exams/presentation/pages/cq_screen.dart';
 import 'scaffold_with_nav_bar.dart';
 
 /// Centralized route name constants — avoids hardcoded path strings.
@@ -42,7 +44,8 @@ class AppRoutes {
   static const String lesson =
       '/platform/:tenantId/course/:courseId/lesson/:lessonId';
   static const String leaderboard = '/platform/:tenantId/leaderboard';
-  static const String exam = '/platform/:tenantId/exam/:examId';
+  static const String mcq = '/platform/:tenantId/exam/:examId/mcq';
+  static const String cq = '/platform/:tenantId/exam/:examId/cq';
   static const String notifications = '/notifications';
 }
 
@@ -286,6 +289,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final tenantId = state.pathParameters['tenantId']!;
           return LeaderboardScreen(tenantId: tenantId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.mcq,
+        name: 'mcq',
+        builder: (context, state) {
+          final examId = state.pathParameters['examId']!;
+          return McqScreen(examId: examId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.cq,
+        name: 'cq',
+        builder: (context, state) {
+          final examId = state.pathParameters['examId']!;
+          return CqScreen(examId: examId);
         },
       ),
     ],

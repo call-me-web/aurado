@@ -78,7 +78,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                     decoration: InputDecoration(
                       hintText: 'Search....',
                       hintStyle: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.4),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                       suffixIcon: Padding(
                         padding: const EdgeInsets.only(right: 4.0),
@@ -88,7 +88,9 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                             size: 22,
                             color: _searchController.text.isNotEmpty
                                 ? colorScheme.primary
-                                : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                : colorScheme.onSurfaceVariant.withValues(
+                                    alpha: 0.5,
+                                  ),
                           ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -271,9 +273,9 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                   width: 72,
                   child: Text(
                     tenant.name,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,

@@ -18,9 +18,11 @@ Aurado is a production-grade educational platform built with a **"Local-First, E
 - **Cloud Storage**: Securely stores backup blobs in Supabase Storage.
 - **Auto-Restore**: Detects existing progress on new devices and prompts for a one-click restoration.
 
-### 4. Premium Dashboard
-- **Dynamic Stats**: Displays real-time streaks, study minutes, and "Smart Review" counts.
-- **Recent Insights**: Quick access to recently accessed lessons and progress.
+### 5. Exam Engine (Phase 3 — In Progress)
+- **Anti-Cheat Guard**: Prevents app backgrounding and split-screen during active exams.
+- **Engagement Analytics**: Tracks "stuck" points and per-question time spent for teacher insights.
+- **Secure MCQ & CQ**: Supports Multiple Choice and Creative Questions with photo upload via Cloudflare R2.
+- **Adaptive Offline Review**: Mistakes and bookmarked questions are synced to the local Drift database for offline study.
 
 ## 🛠 Tech Stack
 - **Core**: Flutter 3.x
