@@ -14,6 +14,11 @@ class ApiEndpoints {
   // ── Courses & Projects ──────────────────────────────────────
   static const String courses = '/courses';
   static const String tenantBranding = '/branding';
+  
+  // ── Storage ─────────────────────────────────────────────────
+  static const String storagePresign = '/storage/presign';
+  static const String storageSignUrl = '/storage/url';
+  static const String storageDelete = '/storage/delete';
 
   // ── Health ──────────────────────────────────────────────────
   static const String healthCheck = '/health';

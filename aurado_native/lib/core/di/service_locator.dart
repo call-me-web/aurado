@@ -23,6 +23,7 @@ import 'package:aurado/features/exams/domain/repositories/exam_repository.dart';
 import 'package:aurado/features/exams/data/repositories/supabase_exam_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:aurado/core/local_storage/drift_database.dart';
+import 'package:aurado/core/network/signed_url_resolver.dart';
 
 /// Global service locator instance.
 final GetIt sl = GetIt.instance;
@@ -47,6 +48,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton<DioClient>(() => DioClient());
+  sl.registerLazySingleton<SignedUrlResolver>(() => SignedUrlResolver(sl<DioClient>().instance, sl<SupabaseClient>()));
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
 
   // ── Database ─────────────────────────────────────────────

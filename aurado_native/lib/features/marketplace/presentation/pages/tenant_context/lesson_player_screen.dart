@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pod_player/pod_player.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:aurado/core/di/service_locator.dart';
+import 'package:aurado/core/network/signed_url_resolver.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LessonPlayerScreen extends ConsumerStatefulWidget {
   final String tenantId;
@@ -32,20 +35,51 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
     super.dispose();
   }
 
-  void _initializePlayer(String url) {
-    if (_lastInitializedUrl == url) return;
+  bool _isResolving = false;
 
-    _controller?.dispose();
-    _lastInitializedUrl = url;
+  Future<void> _initializePlayer(String rawUrl) async {
+    if (_lastInitializedUrl == rawUrl || _isResolving) return;
 
-    _controller = PodPlayerController(
-      playVideoFrom: PlayVideoFrom.network(url),
-      podPlayerConfig: const PodPlayerConfig(
-        autoPlay: true,
-        isLooping: false,
-        videoQualityPriority: [720, 480, 360],
-      ),
-    )..initialise().then((_) => setState(() {}));
+    print('[LessonPlayer] Initializing for: $rawUrl');
+    setState(() => _isResolving = true);
+    
+    try {
+      final resolvedUrl = await sl<SignedUrlResolver>().resolve(
+        rawUrl,
+        courseId: widget.courseId,
+        tenantId: widget.tenantId,
+      );
+      print('[LessonPlayer] Resolved URL: $resolvedUrl');
+
+      if (!mounted) return;
+
+      if (_lastInitializedUrl == rawUrl) {
+         setState(() => _isResolving = false);
+         return;
+      }
+
+      if (_controller != null) {
+        _controller!.dispose();
+      }
+      _lastInitializedUrl = rawUrl;
+
+      final isYoutube = resolvedUrl.contains('youtube.com') || resolvedUrl.contains('youtu.be');
+
+      _controller = PodPlayerController(
+        playVideoFrom: isYoutube 
+            ? PlayVideoFrom.youtube(resolvedUrl) 
+            : PlayVideoFrom.network(resolvedUrl),
+        podPlayerConfig: const PodPlayerConfig(
+          autoPlay: true,
+          isLooping: false,
+          videoQualityPriority: [720, 480, 360],
+        ),
+      );
+      
+      await _controller!.initialise();
+    } finally {
+      if (mounted) setState(() => _isResolving = false);
+    }
   }
 
   @override
@@ -175,8 +209,11 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
   }
 
   Widget _buildPlayer(String url) {
+    // Initialise asynchronously - don't worry about multi-calls, 
+    // _initializePlayer has guards.
     _initializePlayer(url);
-    if (_controller != null) {
+
+    if (_controller != null && _controller!.isInitialised) {
       return Stack(
         children: [
           PodVideoPlayer(
@@ -259,8 +296,16 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
         leading: const HugeIcon(icon: HugeIcons.strokeRoundedFile01, color: Colors.red),
         title: const Text('Lecture Note / PDF', style: TextStyle(fontSize: 14)),
         trailing: const HugeIcon(icon: HugeIcons.strokeRoundedDownload01, size: 20, color: Colors.black),
-        onTap: () {
-          // TODO: Open PDF
+        onTap: () async {
+          final signedUrl = await sl<SignedUrlResolver>().resolve(
+            url,
+            courseId: widget.courseId,
+            tenantId: widget.tenantId,
+          );
+          final uri = Uri.parse(signedUrl);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
         },
       ),
     );
