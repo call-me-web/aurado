@@ -22,6 +22,7 @@ _LessonModel _$LessonModelFromJson(Map<String, dynamic> json) => _LessonModel(
   order: (json['order'] as num?)?.toInt() ?? 0,
   lessonType: json['lesson_type'] as String? ?? 'video',
   durationSec: (json['duration_sec'] as num?)?.toInt(),
+  isPdfDownloadable: json['is_pdf_downloadable'] as bool? ?? true,
   isCompleted: json['isCompleted'] as bool? ?? false,
 );
 
@@ -40,5 +41,6 @@ Map<String, dynamic> _$LessonModelToJson(_LessonModel instance) =>
       'order': instance.order,
       'lesson_type': instance.lessonType,
       'duration_sec': instance.durationSec,
+      'is_pdf_downloadable': instance.isPdfDownloadable,
       'isCompleted': instance.isCompleted,
     };

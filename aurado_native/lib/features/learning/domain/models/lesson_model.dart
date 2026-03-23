@@ -19,6 +19,7 @@ abstract class LessonModel with _$LessonModel {
     @Default(0) int order,
     @JsonKey(name: 'lesson_type') @Default('video') String lessonType,
     @JsonKey(name: 'duration_sec') int? durationSec,
+    @JsonKey(name: 'is_pdf_downloadable') @Default(true) bool isPdfDownloadable,
     @Default(false) bool isCompleted,
   }) = _LessonModel;
 

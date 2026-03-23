@@ -22,6 +22,7 @@ class SignedUrlResolver {
     String url, {
     required String courseId,
     String? tenantId,
+    String? lessonTitle,
   }) async {
     // 1. Skip if empty, local, or already a signed/public URL
     if (url.isEmpty) return url;
@@ -35,7 +36,7 @@ class SignedUrlResolver {
     
     // Check if it's already a signed URL (has signature params)
     final isAlreadySigned = url.contains('X-Amz-Signature=');
-
+    
     // If it's not R2, or it's public, or it's already signed, return as is.
     if (!isR2 || isOnPublicDomain || isAlreadySigned) return url;
 
@@ -49,9 +50,8 @@ class SignedUrlResolver {
         'courseId': courseId,
       };
       if (tenantId != null) queryParams['tenantId'] = tenantId;
+      if (lessonTitle != null) queryParams['lessonTitle'] = lessonTitle;
 
-      print('[SignedUrlResolver] Requesting signature for: $url (Course: $courseId)');
-      
       final response = await _dio.get(
         '${AppConstants.apiBaseUrl}${ApiEndpoints.storageSignUrl}',
         queryParameters: queryParams,
@@ -64,17 +64,13 @@ class SignedUrlResolver {
 
       if (response.statusCode == 200 && response.data != null) {
         final signedUrl = response.data['signedUrl'] as String?;
-        print('[SignedUrlResolver] Received signed URL: $signedUrl');
         return signedUrl ?? url;
       }
     } on DioException catch (e) {
-      if (e.response != null) {
-        print('[SignedUrlResolver] Failed to resolve URL: ${e.response?.statusCode} ${e.response?.data}');
-      } else {
-        print('[SignedUrlResolver] Network error resolving URL: ${e.message} - ${e.error}');
-      }
+      // Log errors but return original URL as fallback
+      print('[SignedUrlResolver] Error: ${e.response?.statusCode} ${e.response?.data}');
     } catch (e) {
-      print('[SignedUrlResolver] Unexpected error resolving URL: $e');
+      print('[SignedUrlResolver] Unexpected error: $e');
     }
 
     return url;

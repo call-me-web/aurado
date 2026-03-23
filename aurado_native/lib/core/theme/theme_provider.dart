@@ -57,12 +57,17 @@ class ThemeNotifier extends Notifier<ThemeState> {
     String? fontFamily,
   }) {
     state = state.copyWith(
-      primaryColor: primaryColor,
-      secondaryColor: secondaryColor,
-      tertiaryColor: tertiaryColor,
-      quaternaryColor: quaternaryColor,
-      fontFamily: fontFamily,
+      primaryColor: primaryColor ?? ThemeConfig.primary,
+      secondaryColor: secondaryColor ?? ThemeConfig.secondary,
+      tertiaryColor: tertiaryColor ?? ThemeConfig.tertiary,
+      quaternaryColor: quaternaryColor ?? ThemeConfig.quaternary,
+      fontFamily: fontFamily ?? ThemeConfig.fontFamily,
     );
+  }
+
+  /// Reset the theme to its default Aurado values.
+  void resetTheme() {
+    state = const ThemeState();
   }
 
   /// Update the application theme mode (dark/light/system)

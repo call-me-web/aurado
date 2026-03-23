@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LessonModel {
 
- String get id;@JsonKey(name: 'chapter_id') String? get chapterId;@JsonKey(name: 'subject_id') String? get subjectId;@JsonKey(name: 'course_id') String? get courseId; String get title; String? get description;@JsonKey(name: 'content_url') String? get contentUrl;@JsonKey(name: 'thumbnail_url') String? get thumbnailUrl;@JsonKey(name: 'pdf_urls') List<String> get pdfUrls;@JsonKey(name: 'is_free') bool get isFree; int get order;@JsonKey(name: 'lesson_type') String get lessonType;@JsonKey(name: 'duration_sec') int? get durationSec; bool get isCompleted;
+ String get id;@JsonKey(name: 'chapter_id') String? get chapterId;@JsonKey(name: 'subject_id') String? get subjectId;@JsonKey(name: 'course_id') String? get courseId; String get title; String? get description;@JsonKey(name: 'content_url') String? get contentUrl;@JsonKey(name: 'thumbnail_url') String? get thumbnailUrl;@JsonKey(name: 'pdf_urls') List<String> get pdfUrls;@JsonKey(name: 'is_free') bool get isFree; int get order;@JsonKey(name: 'lesson_type') String get lessonType;@JsonKey(name: 'duration_sec') int? get durationSec;@JsonKey(name: 'is_pdf_downloadable') bool get isPdfDownloadable; bool get isCompleted;
 /// Create a copy of LessonModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LessonModelCopyWith<LessonModel> get copyWith => _$LessonModelCopyWithImpl<Less
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LessonModel&&(identical(other.id, id) || other.id == id)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.subjectId, subjectId) || other.subjectId == subjectId)&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentUrl, contentUrl) || other.contentUrl == contentUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&const DeepCollectionEquality().equals(other.pdfUrls, pdfUrls)&&(identical(other.isFree, isFree) || other.isFree == isFree)&&(identical(other.order, order) || other.order == order)&&(identical(other.lessonType, lessonType) || other.lessonType == lessonType)&&(identical(other.durationSec, durationSec) || other.durationSec == durationSec)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LessonModel&&(identical(other.id, id) || other.id == id)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.subjectId, subjectId) || other.subjectId == subjectId)&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentUrl, contentUrl) || other.contentUrl == contentUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&const DeepCollectionEquality().equals(other.pdfUrls, pdfUrls)&&(identical(other.isFree, isFree) || other.isFree == isFree)&&(identical(other.order, order) || other.order == order)&&(identical(other.lessonType, lessonType) || other.lessonType == lessonType)&&(identical(other.durationSec, durationSec) || other.durationSec == durationSec)&&(identical(other.isPdfDownloadable, isPdfDownloadable) || other.isPdfDownloadable == isPdfDownloadable)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,chapterId,subjectId,courseId,title,description,contentUrl,thumbnailUrl,const DeepCollectionEquality().hash(pdfUrls),isFree,order,lessonType,durationSec,isCompleted);
+int get hashCode => Object.hash(runtimeType,id,chapterId,subjectId,courseId,title,description,contentUrl,thumbnailUrl,const DeepCollectionEquality().hash(pdfUrls),isFree,order,lessonType,durationSec,isPdfDownloadable,isCompleted);
 
 @override
 String toString() {
-  return 'LessonModel(id: $id, chapterId: $chapterId, subjectId: $subjectId, courseId: $courseId, title: $title, description: $description, contentUrl: $contentUrl, thumbnailUrl: $thumbnailUrl, pdfUrls: $pdfUrls, isFree: $isFree, order: $order, lessonType: $lessonType, durationSec: $durationSec, isCompleted: $isCompleted)';
+  return 'LessonModel(id: $id, chapterId: $chapterId, subjectId: $subjectId, courseId: $courseId, title: $title, description: $description, contentUrl: $contentUrl, thumbnailUrl: $thumbnailUrl, pdfUrls: $pdfUrls, isFree: $isFree, order: $order, lessonType: $lessonType, durationSec: $durationSec, isPdfDownloadable: $isPdfDownloadable, isCompleted: $isCompleted)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LessonModelCopyWith<$Res>  {
   factory $LessonModelCopyWith(LessonModel value, $Res Function(LessonModel) _then) = _$LessonModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'chapter_id') String? chapterId,@JsonKey(name: 'subject_id') String? subjectId,@JsonKey(name: 'course_id') String? courseId, String title, String? description,@JsonKey(name: 'content_url') String? contentUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'pdf_urls') List<String> pdfUrls,@JsonKey(name: 'is_free') bool isFree, int order,@JsonKey(name: 'lesson_type') String lessonType,@JsonKey(name: 'duration_sec') int? durationSec, bool isCompleted
+ String id,@JsonKey(name: 'chapter_id') String? chapterId,@JsonKey(name: 'subject_id') String? subjectId,@JsonKey(name: 'course_id') String? courseId, String title, String? description,@JsonKey(name: 'content_url') String? contentUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'pdf_urls') List<String> pdfUrls,@JsonKey(name: 'is_free') bool isFree, int order,@JsonKey(name: 'lesson_type') String lessonType,@JsonKey(name: 'duration_sec') int? durationSec,@JsonKey(name: 'is_pdf_downloadable') bool isPdfDownloadable, bool isCompleted
 });
 
 
@@ -65,7 +65,7 @@ class _$LessonModelCopyWithImpl<$Res>
 
 /// Create a copy of LessonModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? chapterId = freezed,Object? subjectId = freezed,Object? courseId = freezed,Object? title = null,Object? description = freezed,Object? contentUrl = freezed,Object? thumbnailUrl = freezed,Object? pdfUrls = null,Object? isFree = null,Object? order = null,Object? lessonType = null,Object? durationSec = freezed,Object? isCompleted = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? chapterId = freezed,Object? subjectId = freezed,Object? courseId = freezed,Object? title = null,Object? description = freezed,Object? contentUrl = freezed,Object? thumbnailUrl = freezed,Object? pdfUrls = null,Object? isFree = null,Object? order = null,Object? lessonType = null,Object? durationSec = freezed,Object? isPdfDownloadable = null,Object? isCompleted = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,chapterId: freezed == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
@@ -80,7 +80,8 @@ as List<String>,isFree: null == isFree ? _self.isFree : isFree // ignore: cast_n
 as bool,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
 as int,lessonType: null == lessonType ? _self.lessonType : lessonType // ignore: cast_nullable_to_non_nullable
 as String,durationSec: freezed == durationSec ? _self.durationSec : durationSec // ignore: cast_nullable_to_non_nullable
-as int?,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
+as int?,isPdfDownloadable: null == isPdfDownloadable ? _self.isPdfDownloadable : isPdfDownloadable // ignore: cast_nullable_to_non_nullable
+as bool,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -166,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec,  bool isCompleted)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec, @JsonKey(name: 'is_pdf_downloadable')  bool isPdfDownloadable,  bool isCompleted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LessonModel() when $default != null:
-return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isCompleted);case _:
+return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isPdfDownloadable,_that.isCompleted);case _:
   return orElse();
 
 }
@@ -187,10 +188,10 @@ return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.ti
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec,  bool isCompleted)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec, @JsonKey(name: 'is_pdf_downloadable')  bool isPdfDownloadable,  bool isCompleted)  $default,) {final _that = this;
 switch (_that) {
 case _LessonModel():
-return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isCompleted);case _:
+return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isPdfDownloadable,_that.isCompleted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +208,10 @@ return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.ti
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec,  bool isCompleted)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'chapter_id')  String? chapterId, @JsonKey(name: 'subject_id')  String? subjectId, @JsonKey(name: 'course_id')  String? courseId,  String title,  String? description, @JsonKey(name: 'content_url')  String? contentUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'pdf_urls')  List<String> pdfUrls, @JsonKey(name: 'is_free')  bool isFree,  int order, @JsonKey(name: 'lesson_type')  String lessonType, @JsonKey(name: 'duration_sec')  int? durationSec, @JsonKey(name: 'is_pdf_downloadable')  bool isPdfDownloadable,  bool isCompleted)?  $default,) {final _that = this;
 switch (_that) {
 case _LessonModel() when $default != null:
-return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isCompleted);case _:
+return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.title,_that.description,_that.contentUrl,_that.thumbnailUrl,_that.pdfUrls,_that.isFree,_that.order,_that.lessonType,_that.durationSec,_that.isPdfDownloadable,_that.isCompleted);case _:
   return null;
 
 }
@@ -222,7 +223,7 @@ return $default(_that.id,_that.chapterId,_that.subjectId,_that.courseId,_that.ti
 @JsonSerializable()
 
 class _LessonModel implements LessonModel {
-  const _LessonModel({required this.id, @JsonKey(name: 'chapter_id') this.chapterId, @JsonKey(name: 'subject_id') this.subjectId, @JsonKey(name: 'course_id') this.courseId, required this.title, this.description, @JsonKey(name: 'content_url') this.contentUrl, @JsonKey(name: 'thumbnail_url') this.thumbnailUrl, @JsonKey(name: 'pdf_urls') final  List<String> pdfUrls = const [], @JsonKey(name: 'is_free') this.isFree = false, this.order = 0, @JsonKey(name: 'lesson_type') this.lessonType = 'video', @JsonKey(name: 'duration_sec') this.durationSec, this.isCompleted = false}): _pdfUrls = pdfUrls;
+  const _LessonModel({required this.id, @JsonKey(name: 'chapter_id') this.chapterId, @JsonKey(name: 'subject_id') this.subjectId, @JsonKey(name: 'course_id') this.courseId, required this.title, this.description, @JsonKey(name: 'content_url') this.contentUrl, @JsonKey(name: 'thumbnail_url') this.thumbnailUrl, @JsonKey(name: 'pdf_urls') final  List<String> pdfUrls = const [], @JsonKey(name: 'is_free') this.isFree = false, this.order = 0, @JsonKey(name: 'lesson_type') this.lessonType = 'video', @JsonKey(name: 'duration_sec') this.durationSec, @JsonKey(name: 'is_pdf_downloadable') this.isPdfDownloadable = true, this.isCompleted = false}): _pdfUrls = pdfUrls;
   factory _LessonModel.fromJson(Map<String, dynamic> json) => _$LessonModelFromJson(json);
 
 @override final  String id;
@@ -244,6 +245,7 @@ class _LessonModel implements LessonModel {
 @override@JsonKey() final  int order;
 @override@JsonKey(name: 'lesson_type') final  String lessonType;
 @override@JsonKey(name: 'duration_sec') final  int? durationSec;
+@override@JsonKey(name: 'is_pdf_downloadable') final  bool isPdfDownloadable;
 @override@JsonKey() final  bool isCompleted;
 
 /// Create a copy of LessonModel
@@ -259,16 +261,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LessonModel&&(identical(other.id, id) || other.id == id)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.subjectId, subjectId) || other.subjectId == subjectId)&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentUrl, contentUrl) || other.contentUrl == contentUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&const DeepCollectionEquality().equals(other._pdfUrls, _pdfUrls)&&(identical(other.isFree, isFree) || other.isFree == isFree)&&(identical(other.order, order) || other.order == order)&&(identical(other.lessonType, lessonType) || other.lessonType == lessonType)&&(identical(other.durationSec, durationSec) || other.durationSec == durationSec)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LessonModel&&(identical(other.id, id) || other.id == id)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.subjectId, subjectId) || other.subjectId == subjectId)&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.contentUrl, contentUrl) || other.contentUrl == contentUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&const DeepCollectionEquality().equals(other._pdfUrls, _pdfUrls)&&(identical(other.isFree, isFree) || other.isFree == isFree)&&(identical(other.order, order) || other.order == order)&&(identical(other.lessonType, lessonType) || other.lessonType == lessonType)&&(identical(other.durationSec, durationSec) || other.durationSec == durationSec)&&(identical(other.isPdfDownloadable, isPdfDownloadable) || other.isPdfDownloadable == isPdfDownloadable)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,chapterId,subjectId,courseId,title,description,contentUrl,thumbnailUrl,const DeepCollectionEquality().hash(_pdfUrls),isFree,order,lessonType,durationSec,isCompleted);
+int get hashCode => Object.hash(runtimeType,id,chapterId,subjectId,courseId,title,description,contentUrl,thumbnailUrl,const DeepCollectionEquality().hash(_pdfUrls),isFree,order,lessonType,durationSec,isPdfDownloadable,isCompleted);
 
 @override
 String toString() {
-  return 'LessonModel(id: $id, chapterId: $chapterId, subjectId: $subjectId, courseId: $courseId, title: $title, description: $description, contentUrl: $contentUrl, thumbnailUrl: $thumbnailUrl, pdfUrls: $pdfUrls, isFree: $isFree, order: $order, lessonType: $lessonType, durationSec: $durationSec, isCompleted: $isCompleted)';
+  return 'LessonModel(id: $id, chapterId: $chapterId, subjectId: $subjectId, courseId: $courseId, title: $title, description: $description, contentUrl: $contentUrl, thumbnailUrl: $thumbnailUrl, pdfUrls: $pdfUrls, isFree: $isFree, order: $order, lessonType: $lessonType, durationSec: $durationSec, isPdfDownloadable: $isPdfDownloadable, isCompleted: $isCompleted)';
 }
 
 
@@ -279,7 +281,7 @@ abstract mixin class _$LessonModelCopyWith<$Res> implements $LessonModelCopyWith
   factory _$LessonModelCopyWith(_LessonModel value, $Res Function(_LessonModel) _then) = __$LessonModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'chapter_id') String? chapterId,@JsonKey(name: 'subject_id') String? subjectId,@JsonKey(name: 'course_id') String? courseId, String title, String? description,@JsonKey(name: 'content_url') String? contentUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'pdf_urls') List<String> pdfUrls,@JsonKey(name: 'is_free') bool isFree, int order,@JsonKey(name: 'lesson_type') String lessonType,@JsonKey(name: 'duration_sec') int? durationSec, bool isCompleted
+ String id,@JsonKey(name: 'chapter_id') String? chapterId,@JsonKey(name: 'subject_id') String? subjectId,@JsonKey(name: 'course_id') String? courseId, String title, String? description,@JsonKey(name: 'content_url') String? contentUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'pdf_urls') List<String> pdfUrls,@JsonKey(name: 'is_free') bool isFree, int order,@JsonKey(name: 'lesson_type') String lessonType,@JsonKey(name: 'duration_sec') int? durationSec,@JsonKey(name: 'is_pdf_downloadable') bool isPdfDownloadable, bool isCompleted
 });
 
 
@@ -296,7 +298,7 @@ class __$LessonModelCopyWithImpl<$Res>
 
 /// Create a copy of LessonModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? chapterId = freezed,Object? subjectId = freezed,Object? courseId = freezed,Object? title = null,Object? description = freezed,Object? contentUrl = freezed,Object? thumbnailUrl = freezed,Object? pdfUrls = null,Object? isFree = null,Object? order = null,Object? lessonType = null,Object? durationSec = freezed,Object? isCompleted = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? chapterId = freezed,Object? subjectId = freezed,Object? courseId = freezed,Object? title = null,Object? description = freezed,Object? contentUrl = freezed,Object? thumbnailUrl = freezed,Object? pdfUrls = null,Object? isFree = null,Object? order = null,Object? lessonType = null,Object? durationSec = freezed,Object? isPdfDownloadable = null,Object? isCompleted = null,}) {
   return _then(_LessonModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,chapterId: freezed == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
@@ -311,7 +313,8 @@ as List<String>,isFree: null == isFree ? _self.isFree : isFree // ignore: cast_n
 as bool,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
 as int,lessonType: null == lessonType ? _self.lessonType : lessonType // ignore: cast_nullable_to_non_nullable
 as String,durationSec: freezed == durationSec ? _self.durationSec : durationSec // ignore: cast_nullable_to_non_nullable
-as int?,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
+as int?,isPdfDownloadable: null == isPdfDownloadable ? _self.isPdfDownloadable : isPdfDownloadable // ignore: cast_nullable_to_non_nullable
+as bool,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

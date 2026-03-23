@@ -201,3 +201,153 @@ BEGIN
       updated_at = now();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION save_curriculum(
+  p_course_id UUID, 
+  p_subjects JSONB, 
+  p_chapters JSONB, 
+  p_lessons JSONB
+)
+RETURNS VOID AS $$
+DECLARE
+  v_user_id UUID;
+  v_tenant_id UUID;
+  s RECORD;
+  c RECORD;
+  l RECORD;
+  v_subject_id UUID;
+  v_chapter_id UUID;
+  v_lesson_id UUID;
+  valid_subject_ids UUID[] := '{}';
+  valid_chapter_ids UUID[] := '{}';
+  valid_lesson_ids UUID[] := '{}';
+BEGIN
+  v_user_id := auth.uid();
+  SELECT tenant_id INTO v_tenant_id FROM courses WHERE id = p_course_id;
+  IF v_tenant_id IS NULL THEN RAISE EXCEPTION 'Course not found'; END IF;
+
+  IF NOT is_active_editor(v_tenant_id) AND NOT EXISTS (SELECT 1 FROM tenants WHERE id = v_tenant_id AND owner_id = v_user_id) THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
+
+  -- 1. Upsert Root Subjects & their nested items
+  IF p_subjects IS NOT NULL THEN
+    FOR s IN SELECT * FROM jsonb_array_elements(p_subjects) WITH ORDINALITY AS t(value, idx) LOOP
+      v_subject_id := CASE WHEN (s.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (s.value->>'id')::UUID ELSE uuid_generate_v4() END;
+      
+      INSERT INTO subjects (id, course_id, title, "order") 
+      VALUES (v_subject_id, p_course_id, s.value->>'title', COALESCE((s.value->>'order')::INTEGER, (s.idx - 1)::INTEGER))
+      ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, "order" = EXCLUDED."order" RETURNING id INTO v_subject_id;
+      
+      valid_subject_ids := array_append(valid_subject_ids, v_subject_id);
+
+      -- Subject's Chapters
+      IF s.value->'chapters' IS NOT NULL THEN
+        FOR c IN SELECT * FROM jsonb_array_elements(s.value->'chapters') WITH ORDINALITY AS t(value, idx) LOOP
+          v_chapter_id := CASE WHEN (c.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (c.value->>'id')::UUID ELSE uuid_generate_v4() END;
+          
+          INSERT INTO chapters (id, subject_id, course_id, title, "order") 
+          VALUES (v_chapter_id, v_subject_id, NULL, c.value->>'title', COALESCE((c.value->>'order')::INTEGER, (c.idx - 1)::INTEGER))
+          ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, "order" = EXCLUDED."order", subject_id = EXCLUDED.subject_id, course_id = EXCLUDED.course_id RETURNING id INTO v_chapter_id;
+          
+          valid_chapter_ids := array_append(valid_chapter_ids, v_chapter_id);
+
+          -- Chapter's Lessons
+          IF c.value->'lessons' IS NOT NULL THEN
+            FOR l IN SELECT * FROM jsonb_array_elements(c.value->'lessons') WITH ORDINALITY AS t(value, idx) LOOP
+              v_lesson_id := CASE WHEN (l.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (l.value->>'id')::UUID ELSE uuid_generate_v4() END;
+              INSERT INTO lessons (id, chapter_id, subject_id, course_id, title, content_url, thumbnail_url, is_free, is_pdf_downloadable, "order") 
+              VALUES (
+                v_lesson_id, 
+                v_chapter_id, NULL, NULL, l.value->>'title', l.value->>'contentUrl', l.value->>'thumbnailUrl', COALESCE((l.value->>'isFree')::BOOLEAN, false), COALESCE((l.value->>'isPdfDownloadable')::BOOLEAN, true), COALESCE((l.value->>'order')::INTEGER, (l.idx - 1)::INTEGER)
+              )
+              ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, content_url = EXCLUDED.content_url, thumbnail_url = EXCLUDED.thumbnail_url, is_free = EXCLUDED.is_free, is_pdf_downloadable = EXCLUDED.is_pdf_downloadable, "order" = EXCLUDED."order", chapter_id=EXCLUDED.chapter_id, subject_id=EXCLUDED.subject_id, course_id=EXCLUDED.course_id
+              RETURNING id INTO v_lesson_id;
+              valid_lesson_ids := array_append(valid_lesson_ids, v_lesson_id);
+            END LOOP;
+          END IF;
+        END LOOP;
+      END IF;
+
+      -- Subject's Direct Lessons
+      IF s.value->'lessons' IS NOT NULL THEN
+        FOR l IN SELECT * FROM jsonb_array_elements(s.value->'lessons') WITH ORDINALITY AS t(value, idx) LOOP
+          v_lesson_id := CASE WHEN (l.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (l.value->>'id')::UUID ELSE uuid_generate_v4() END;
+          INSERT INTO lessons (id, chapter_id, subject_id, course_id, title, content_url, thumbnail_url, is_free, is_pdf_downloadable, "order") 
+          VALUES (
+            v_lesson_id, 
+            NULL, v_subject_id, NULL, l.value->>'title', l.value->>'contentUrl', l.value->>'thumbnailUrl', COALESCE((l.value->>'isFree')::BOOLEAN, false), COALESCE((l.value->>'isPdfDownloadable')::BOOLEAN, true), COALESCE((l.value->>'order')::INTEGER, (l.idx - 1)::INTEGER)
+          )
+          ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, content_url = EXCLUDED.content_url, thumbnail_url = EXCLUDED.thumbnail_url, is_free = EXCLUDED.is_free, is_pdf_downloadable = EXCLUDED.is_pdf_downloadable, "order" = EXCLUDED."order", chapter_id=EXCLUDED.chapter_id, subject_id=EXCLUDED.subject_id, course_id=EXCLUDED.course_id
+          RETURNING id INTO v_lesson_id;
+          valid_lesson_ids := array_append(valid_lesson_ids, v_lesson_id);
+        END LOOP;
+      END IF;
+    END LOOP;
+  END IF;
+
+  -- 2. Upsert Root Chapters
+  IF p_chapters IS NOT NULL THEN
+    FOR c IN SELECT * FROM jsonb_array_elements(p_chapters) WITH ORDINALITY AS t(value, idx) LOOP
+      v_chapter_id := CASE WHEN (c.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (c.value->>'id')::UUID ELSE uuid_generate_v4() END;
+      
+      INSERT INTO chapters (id, subject_id, course_id, title, "order") 
+      VALUES (v_chapter_id, NULL, p_course_id, c.value->>'title', COALESCE((c.value->>'order')::INTEGER, (c.idx - 1)::INTEGER))
+      ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, "order" = EXCLUDED."order", subject_id = EXCLUDED.subject_id, course_id = EXCLUDED.course_id RETURNING id INTO v_chapter_id;
+      
+      valid_chapter_ids := array_append(valid_chapter_ids, v_chapter_id);
+
+      -- Root Chapter's Lessons
+      IF c.value->'lessons' IS NOT NULL THEN
+        FOR l IN SELECT * FROM jsonb_array_elements(c.value->'lessons') WITH ORDINALITY AS t(value, idx) LOOP
+          v_lesson_id := CASE WHEN (l.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (l.value->>'id')::UUID ELSE uuid_generate_v4() END;
+          INSERT INTO lessons (id, chapter_id, subject_id, course_id, title, content_url, thumbnail_url, is_free, is_pdf_downloadable, "order") 
+          VALUES (
+            v_lesson_id, 
+            v_chapter_id, NULL, NULL, l.value->>'title', l.value->>'contentUrl', l.value->>'thumbnailUrl', COALESCE((l.value->>'isFree')::BOOLEAN, false), COALESCE((l.value->>'isPdfDownloadable')::BOOLEAN, true), COALESCE((l.value->>'order')::INTEGER, (l.idx - 1)::INTEGER)
+          )
+          ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, content_url = EXCLUDED.content_url, thumbnail_url = EXCLUDED.thumbnail_url, is_free = EXCLUDED.is_free, is_pdf_downloadable = EXCLUDED.is_pdf_downloadable, "order" = EXCLUDED."order", chapter_id=EXCLUDED.chapter_id, subject_id=EXCLUDED.subject_id, course_id=EXCLUDED.course_id
+          RETURNING id INTO v_lesson_id;
+          valid_lesson_ids := array_append(valid_lesson_ids, v_lesson_id);
+        END LOOP;
+      END IF;
+    END LOOP;
+  END IF;
+
+  -- 3. Upsert Root Lessons
+  IF p_lessons IS NOT NULL THEN
+    FOR l IN SELECT * FROM jsonb_array_elements(p_lessons) WITH ORDINALITY AS t(value, idx) LOOP
+      v_lesson_id := CASE WHEN (l.value->>'id') ~ '^[0-9a-fA-F-]{36}$' THEN (l.value->>'id')::UUID ELSE uuid_generate_v4() END;
+      INSERT INTO lessons (id, chapter_id, subject_id, course_id, title, content_url, thumbnail_url, is_free, is_pdf_downloadable, "order") 
+      VALUES (
+        v_lesson_id, 
+        NULL, NULL, p_course_id, l.value->>'title', l.value->>'contentUrl', l.value->>'thumbnailUrl', COALESCE((l.value->>'isFree')::BOOLEAN, false), COALESCE((l.value->>'isPdfDownloadable')::BOOLEAN, true), COALESCE((l.value->>'order')::INTEGER, (l.idx - 1)::INTEGER)
+      )
+      ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, content_url = EXCLUDED.content_url, thumbnail_url = EXCLUDED.thumbnail_url, is_free = EXCLUDED.is_free, is_pdf_downloadable = EXCLUDED.is_pdf_downloadable, "order" = EXCLUDED."order", chapter_id=EXCLUDED.chapter_id, subject_id=EXCLUDED.subject_id, course_id=EXCLUDED.course_id
+      RETURNING id INTO v_lesson_id;
+      valid_lesson_ids := array_append(valid_lesson_ids, v_lesson_id);
+    END LOOP;
+  END IF;
+
+  -- 4. Delete orphans
+  DELETE FROM subjects WHERE course_id = p_course_id AND NOT (id = ANY(valid_subject_ids));
+  -- For chapters, they either belong to a subject in this course or the course directly
+  DELETE FROM chapters WHERE (course_id = p_course_id OR subject_id IN (SELECT id FROM subjects WHERE course_id = p_course_id)) AND NOT (id = ANY(valid_chapter_ids));
+  -- For lessons
+  DELETE FROM lessons WHERE (
+    course_id = p_course_id OR 
+    subject_id IN (SELECT id FROM subjects WHERE course_id = p_course_id) OR
+    chapter_id IN (SELECT id FROM chapters WHERE course_id = p_course_id OR subject_id IN (SELECT id FROM subjects WHERE course_id = p_course_id))
+  ) AND NOT (id = ANY(valid_lesson_ids));
+
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

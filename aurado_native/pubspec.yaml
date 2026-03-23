@@ -46,6 +46,7 @@ dependencies:
   pod_player: ^0.2.1
   image_picker: ^1.1.2
   url_launcher: ^6.3.1
+  syncfusion_flutter_pdfviewer: ^33.1.44
 
   # ── Networking & Utils ────────────────────────────────────
   dio: ^5.8.0+1

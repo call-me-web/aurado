@@ -20,6 +20,7 @@ import 'package:aurado/features/exams/presentation/pages/mcq_screen.dart';
 import 'package:aurado/features/exams/presentation/pages/cq_screen.dart';
 import 'package:aurado/features/marketplace/presentation/my_courses_screen.dart';
 import 'scaffold_with_nav_bar.dart';
+import 'course_context_shell.dart';
 
 /// Centralized route name constants — avoids hardcoded path strings.
 class AppRoutes {
@@ -39,12 +40,19 @@ class AppRoutes {
   static const String library = '/app/library';
   static const String profile = '/app/profile';
   static const String platform = '/platform/:tenantId';
-  static const String courseDetail = '/platform/:tenantId/course/:courseId';
-  static const String curriculum =
-      '/platform/:tenantId/course/:courseId/curriculum';
+  static const String courseBase = '/platform/:tenantId/course/:courseId';
+  static const String courseOverview =
+      '/platform/:tenantId/course/:courseId/overview';
+  static const String courseContent =
+      '/platform/:tenantId/course/:courseId/content';
+  static const String courseLeaderboard =
+      '/platform/:tenantId/course/:courseId/leaderboard';
+  static const String courseProgress =
+      '/platform/:tenantId/course/:courseId/progress';
+  static const String academyProfile =
+      '/platform/:tenantId/course/:courseId/academy';
   static const String lesson =
       '/platform/:tenantId/course/:courseId/lesson/:lessonId';
-  static const String leaderboard = '/platform/:tenantId/leaderboard';
   static const String mcq = '/platform/:tenantId/exam/:examId/mcq';
   static const String cq = '/platform/:tenantId/exam/:examId/cq';
   static const String notifications = '/notifications';
@@ -251,23 +259,73 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PlatformHomeScreen(tenantId: tenantId);
         },
       ),
-      GoRoute(
-        path: AppRoutes.courseDetail,
-        name: 'courseDetail',
-        builder: (context, state) {
+      ShellRoute(
+        builder: (context, state, child) {
           final tenantId = state.pathParameters['tenantId']!;
           final courseId = state.pathParameters['courseId']!;
-          return CourseDetailScreen(tenantId: tenantId, courseId: courseId);
+          return CourseContextShell(
+            child: child,
+            tenantId: tenantId,
+            courseId: courseId,
+            location: state.matchedLocation,
+          );
         },
-      ),
-      GoRoute(
-        path: AppRoutes.curriculum,
-        name: 'curriculum',
-        builder: (context, state) {
-          final tenantId = state.pathParameters['tenantId']!;
-          final courseId = state.pathParameters['courseId']!;
-          return CurriculumScreen(tenantId: tenantId, courseId: courseId);
-        },
+        routes: [
+          GoRoute(
+            path: AppRoutes.courseBase,
+            redirect: (context, state) {
+              final tenantId = state.pathParameters['tenantId']!;
+              final courseId = state.pathParameters['courseId']!;
+              return '/platform/$tenantId/course/$courseId/overview';
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.courseOverview,
+            name: 'courseOverview',
+            builder: (context, state) {
+              final tenantId = state.pathParameters['tenantId']!;
+              final courseId = state.pathParameters['courseId']!;
+              return CourseDetailScreen(
+                tenantId: tenantId,
+                courseId: courseId,
+              );
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.courseContent,
+            name: 'courseContent',
+            builder: (context, state) {
+              final tenantId = state.pathParameters['tenantId']!;
+              final courseId = state.pathParameters['courseId']!;
+              return CurriculumScreen(
+                tenantId: tenantId,
+                courseId: courseId,
+              );
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.courseLeaderboard,
+            name: 'courseLeaderboard',
+            builder: (context, state) {
+              final tenantId = state.pathParameters['tenantId']!;
+              return LeaderboardScreen(tenantId: tenantId);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.courseProgress,
+            name: 'courseProgress',
+            builder: (context, state) =>
+                const _PlaceholderPage(label: 'Course Progress'),
+          ),
+          GoRoute(
+            path: AppRoutes.academyProfile,
+            name: 'academyProfile',
+            builder: (context, state) {
+              final tenantId = state.pathParameters['tenantId']!;
+              return PlatformHomeScreen(tenantId: tenantId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.lesson,
@@ -281,14 +339,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             courseId: courseId,
             lessonId: lessonId,
           );
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.leaderboard,
-        name: 'leaderboard',
-        builder: (context, state) {
-          final tenantId = state.pathParameters['tenantId']!;
-          return LeaderboardScreen(tenantId: tenantId);
         },
       ),
       GoRoute(

@@ -16,9 +16,10 @@ class ApiEndpoints {
   static const String tenantBranding = '/branding';
   
   // ── Storage ─────────────────────────────────────────────────
-  static const String storagePresign = '/storage/presign';
-  static const String storageSignUrl = '/storage/url';
-  static const String storageDelete = '/storage/delete';
+  // Backend mounts storage routes at /api/storage/*
+  static const String storagePresign = '/api/storage/presign';
+  static const String storageSignUrl = '/api/storage/url';
+  static const String storageDelete = '/api/storage/delete';
 
   // ── Health ──────────────────────────────────────────────────
   static const String healthCheck = '/health';

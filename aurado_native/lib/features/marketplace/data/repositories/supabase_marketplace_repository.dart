@@ -74,13 +74,23 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
   Future<List<TenantModel>> getFeaturedTenants() async {
     final response = await _supabase
         .from('tenants')
-        .select()
+        .select('*, branding(*)')
         .limit(10);
     
     return (response as List).map((json) {
       final map = Map<String, dynamic>.from(json);
+      final branding = map['branding'] as Map<String, dynamic>?;
+      
       map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
       map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
+      
+      // Map branding fields to TenantModel
+      if (branding != null) {
+        map['color_background'] = branding['color_background'];
+        map['color_button'] = branding['color_button'];
+        map['color_card'] = branding['color_card'];
+      }
+      
       return TenantModel.fromJson(map);
     }).toList();
   }
@@ -89,15 +99,25 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
   Future<TenantModel?> getTenantById(String id) async {
     final response = await _supabase
         .from('tenants')
-        .select()
+        .select('*, branding(*)')
         .eq('id', id)
         .maybeSingle();
 
     if (response == null) return null;
 
     final map = Map<String, dynamic>.from(response);
+    final branding = map['branding'] as Map<String, dynamic>?;
+
     map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
     map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
+
+    // Map branding fields to TenantModel
+    if (branding != null) {
+      map['color_background'] = branding['color_background'];
+      map['color_button'] = branding['color_button'];
+      map['color_card'] = branding['color_card'];
+    }
+
     return TenantModel.fromJson(map);
   }
 
