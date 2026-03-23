@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/models/tenant_model.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../providers/marketplace_provider.dart';
 
@@ -53,17 +54,21 @@ class _TenantThemeObserverState extends ConsumerState<TenantThemeObserver> {
     );
   }
 
-  void _updateTheme(dynamic tenant) {
+  void _updateTheme(TenantModel tenant) {
     // Schedule the update for the next frame to avoid "build phase" modification errors.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
       final primaryColor = _parseColor(tenant.colorButton);
+      final backgroundColor = _parseColor(tenant.colorBackground);
+      final cardColor = _parseColor(tenant.colorCard);
       
       ref.read(themeProvider.notifier).updateTheme(
             primaryColor: primaryColor,
             // Assuming we use background color for secondary/surface in the future
             secondaryColor: primaryColor?.withValues(alpha: 0.8),
+            backgroundColor: backgroundColor,
+            cardColor: cardColor,
           );
     });
   }

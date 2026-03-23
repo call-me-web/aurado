@@ -48,7 +48,6 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
   Future<void> _initializePlayer(String rawUrl, String lessonTitle) async {
     if (_lastInitializedUrl == rawUrl || _isResolving) return;
 
-    print('[LessonPlayer] Initializing for: $rawUrl');
     setState(() {
       _isResolving = true;
       _errorMessage = null;
@@ -61,7 +60,6 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
         tenantId: widget.tenantId,
         lessonTitle: lessonTitle,
       );
-      print('[LessonPlayer] Resolved URL: $resolvedUrl');
 
       if (!mounted) return;
 
@@ -91,9 +89,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
       );
 
       await _controller!.initialise();
-    } catch (e, stack) {
-      print('[LessonPlayer] Player initialization error: $e');
-      print('[LessonPlayer] Stack: $stack');
+    } catch (e) {
       if (mounted) {
         setState(() => _errorMessage = 'Video playback failed: $e');
       }
@@ -525,7 +521,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
               podProgressBarConfig: PodProgressBarConfig(
                 playingBarColor: theme.colorScheme.primary,
                 circleHandlerColor: theme.colorScheme.primary,
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
               ),
             ),
             Positioned(

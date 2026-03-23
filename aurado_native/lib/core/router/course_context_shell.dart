@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../presentation/components/aurado_navigation_bar.dart';
 import '../../features/marketplace/presentation/widgets/tenant_theme_observer.dart';
+import '../theme/aurado_theme.dart';
 import 'app_router.dart';
 
 /// The scaffold for the course context using [StatefulShellRoute].
@@ -29,43 +31,25 @@ class CourseContextShell extends StatefulWidget {
 
 class _CourseContextShellState extends State<CourseContextShell>
     with SingleTickerProviderStateMixin {
-  bool _isHovered = false;
-  bool _showText = false;
-  late AnimationController _glitchController;
+  int _revealCounter = 0;
 
   @override
   void initState() {
     super.initState();
-    _glitchController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
   }
 
   @override
   void didUpdateWidget(CourseContextShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.location != widget.location) {
-      // Trigger glitch on navigation
-      _triggerGlitch();
+      // Trigger reveal on navigation by incrementing a counter
+      setState(() => _revealCounter++);
     }
   }
 
   @override
   void dispose() {
-    _glitchController.dispose();
     super.dispose();
-  }
-
-  void _triggerGlitch() {
-    setState(() => _showText = true);
-    _glitchController.forward(from: 0).then((_) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && !_isHovered) {
-          setState(() => _showText = false);
-        }
-      });
-    });
   }
 
   int _calculateSelectedIndex(String location) {
@@ -94,6 +78,7 @@ class _CourseContextShellState extends State<CourseContextShell>
       case 2:
         context.goNamed('courseLeaderboard', pathParameters: {
           'tenantId': widget.tenantId,
+          'courseId': widget.courseId,
         });
         break;
       case 3:
@@ -105,6 +90,7 @@ class _CourseContextShellState extends State<CourseContextShell>
       case 4:
         context.goNamed('academyProfile', pathParameters: {
           'tenantId': widget.tenantId,
+          'courseId': widget.courseId,
         });
         break;
     }
@@ -112,8 +98,6 @@ class _CourseContextShellState extends State<CourseContextShell>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final currentIndex = _calculateSelectedIndex(widget.location);
 
     return TenantThemeObserver(
@@ -128,7 +112,7 @@ class _CourseContextShellState extends State<CourseContextShell>
             Positioned(
               top: MediaQuery.of(context).padding.top + 10,
               right: 20,
-              child: _buildHomeButton(context, colorScheme),
+              child: _HomeButton(revealTrigger: _revealCounter),
             ),
           ],
         ),
@@ -161,16 +145,70 @@ class _CourseContextShellState extends State<CourseContextShell>
       ),
     );
   }
+}
 
-  Widget _buildHomeButton(BuildContext context, ColorScheme colorScheme) {
+class _HomeButton extends StatefulWidget {
+  final int revealTrigger;
+
+  const _HomeButton({required this.revealTrigger});
+
+  @override
+  State<_HomeButton> createState() => _HomeButtonState();
+}
+
+class _HomeButtonState extends State<_HomeButton> {
+  bool _isHovered = false;
+  bool _showText = false;
+  Timer? _revealTimer;
+
+  @override
+  void didUpdateWidget(_HomeButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.revealTrigger != widget.revealTrigger) {
+      _triggerReveal();
+    }
+  }
+
+  @override
+  void dispose() {
+    _revealTimer?.cancel();
+    super.dispose();
+  }
+
+  void _triggerReveal() {
+    setState(() => _showText = true);
+    _revealTimer?.cancel();
+    _revealTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted && !_isHovered) {
+        setState(() => _showText = false);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final navTheme = theme.extension<NavBarTheme>();
+    final activeColor = navTheme?.activeColor ?? Colors.blue;
+    final inactiveColor = navTheme?.unselectedColor ?? colorScheme.onSurface.withValues(alpha: 0.6);
     final showExpanded = _isHovered || _showText;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        // If we were showing text via trigger, start/restart the timer when leaving hover
+        if (_showText) {
+          _triggerReveal();
+        }
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        height: 40, // Fixed height to prevent vertical stretching
+        height: 40,
+        clipBehavior: Clip.antiAlias,
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
           color: colorScheme.surface.withValues(alpha: 0.9),
@@ -193,9 +231,9 @@ class _CourseContextShellState extends State<CourseContextShell>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const HugeIcon(
+                  HugeIcon(
                     icon: HugeIcons.strokeRoundedHome01,
-                    color: Colors.blue,
+                    color: activeColor,
                     size: 20,
                   ),
                   AnimatedSize(
@@ -208,13 +246,14 @@ class _CourseContextShellState extends State<CourseContextShell>
                         child: AnimatedOpacity(
                           duration: const Duration(milliseconds: 200),
                           opacity: showExpanded ? 1 : 0,
-                          child: _GlitchText(
-                            text: 'Aurado home',
-                            trigger: _glitchController,
+                          child: Text(
+                            'Aurado home',
+                            softWrap: false,
+                            overflow: TextOverflow.clip,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
-                              color: colorScheme.onSurface,
+                              color: inactiveColor,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -232,71 +271,3 @@ class _CourseContextShellState extends State<CourseContextShell>
   }
 }
 
-class _GlitchText extends StatelessWidget {
-  final String text;
-  final Animation<double> trigger;
-  final TextStyle style;
-
-  const _GlitchText({
-    required this.text,
-    required this.trigger,
-    required this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: trigger,
-      builder: (context, child) {
-        final value = trigger.value;
-        if (value == 0 || value == 1) {
-          return Text(
-            text,
-            style: style,
-            softWrap: false,
-            overflow: TextOverflow.visible,
-          );
-        }
-
-        // Simple Glitch Effect: Layered text with offsets and color splits
-        final offset1 = (value < 0.3 || (value > 0.6 && value < 0.7)) ? 1.5 : 0.0;
-        final offset2 = (value > 0.3 && value < 0.5) ? -1.5 : 0.0;
-        final opacity = (value * 10).toInt() % 2 == 0 ? 1.0 : 0.7;
-
-        return Stack(
-          children: [
-            // Red Split
-            Transform.translate(
-              offset: Offset(offset1, 0),
-              child: Text(
-                text,
-                softWrap: false,
-                style: style.copyWith(
-                  color: Colors.red.withValues(alpha: 0.5 * opacity),
-                ),
-              ),
-            ),
-            // Blue Split
-            Transform.translate(
-              offset: Offset(offset2, 0),
-              child: Text(
-                text,
-                softWrap: false,
-                style: style.copyWith(
-                  color: Colors.blue.withValues(alpha: 0.5 * opacity),
-                ),
-              ),
-            ),
-            // Original
-            Text(
-              text,
-              softWrap: false,
-              style: style.copyWith(
-                  color: style.color?.withValues(alpha: opacity)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}

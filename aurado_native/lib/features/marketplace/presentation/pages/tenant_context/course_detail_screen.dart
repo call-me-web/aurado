@@ -1,11 +1,15 @@
-import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
-import 'package:aurado/features/marketplace/providers/marketplace_provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
+import 'package:aurado/features/marketplace/providers/marketplace_provider.dart';
+
+// Height of the hero image banner at the top.
+const double _kHeroHeight = 280.0;
 
 class CourseDetailScreen extends ConsumerWidget {
   final String tenantId;
@@ -21,178 +25,221 @@ class CourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final coursesAsync = ref.watch(discoveryCoursesProvider(tenantId: tenantId));
 
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    // Listen to enrollment status
-    ref.listen(enrollmentControllerProvider, (previous, next) {
-      next.when(
-        data: (urlOrStatus) {
-          if (urlOrStatus == 'success') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Succesfully enrolled!')),
-            );
-            context.pushReplacement('/platform/$tenantId/course/$courseId/curriculum');
-          } else if (urlOrStatus != null) {
-            // It's a payment URL
-            launchUrl(Uri.parse(urlOrStatus), mode: LaunchMode.externalApplication);
-          }
-        },
-        error: (err, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $err'), backgroundColor: colorScheme.error),
-          );
-        },
-        loading: () {},
-      );
-    });
-
     final enrollmentState = ref.watch(enrollmentControllerProvider);
     final enrolledCoursesAsync = ref.watch(enrolledCoursesProvider);
     final isLoading = enrollmentState.isLoading;
 
+    // Listen to enrollment status changes to react to success/payment.
+    ref.listen(enrollmentControllerProvider, (previous, next) {
+      final urlOrStatus = next.asData?.value;
+      if (urlOrStatus == null) return;
+      if (urlOrStatus == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully enrolled!')),
+        );
+        context.pushReplacement('/platform/$tenantId/course/$courseId/overview');
+      } else {
+        final uri = Uri.tryParse(urlOrStatus);
+        if (uri != null && (uri.hasScheme || urlOrStatus.startsWith('http'))) {
+          launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      }
+    });
+
     final isEnrolled = enrolledCoursesAsync.when(
       data: (courses) => courses.any((c) => c.id == courseId),
       loading: () => false,
-      error: (_, __) => false,
+      error: (error, stack) => false,
     );
 
     return coursesAsync.when(
       data: (courses) {
-        final course = courses.firstWhere(
-          (c) => c.id == courseId,
-          orElse: () => throw Exception('Course not found'),
-        );
+        final course = courses.where((c) => c.id == courseId).firstOrNull;
 
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              _buildSliverAppBar(context, course, colorScheme),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeaderInfo(course, colorScheme, textTheme),
-                      const Gap(24),
-                      _buildDescription(course, colorScheme, textTheme),
-                      const Gap(24),
-                      if (course.whatYouWillLearn.isNotEmpty)
-                        _buildSection('What you will learn', _buildLearningPoints(course, colorScheme, textTheme), textTheme),
-                      const Gap(24),
-                      if (course.requirements.isNotEmpty)
-                        _buildSection('Requirements', _buildRequirementsList(course, colorScheme, textTheme), textTheme),
-                      const Gap(24),
-                      if (course.learningMaterials.isNotEmpty)
-                        _buildSection('Includes', _buildMaterialsGrid(course, colorScheme, textTheme), textTheme),
-                      const Gap(100), // Space for bottom action bar
-                    ],
+        if (course == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Course not found')),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  const Text('This course could not be found.'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.pop(),
+                    child: const Text('Go Back'),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          bottomSheet: _buildBottomActionBar(
-            context,
-            course,
-            colorScheme,
-            textTheme,
-            ref,
-            isLoading,
-            isEnrolled,
-          ),
+            ),
+          );
+        }
+
+        return _CourseDetailBody(
+          course: course,
+          isLoading: isLoading,
+          isEnrolled: isEnrolled,
+          tenantId: tenantId,
+          courseId: courseId,
+          ref: ref,
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, s) => Scaffold(body: Center(child: Text('Error: $e'))),
     );
   }
+}
 
-  Widget _buildSliverAppBar(BuildContext context, DiscoveryCourseModel course, ColorScheme colorScheme) {
-    return SliverAppBar(
-      expandedHeight: 240,
-      pinned: true,
-      backgroundColor: colorScheme.surface,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: CircleAvatar(
-          backgroundColor: Colors.black.withValues(alpha: 0.3),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
-            onPressed: () => context.pop(),
+/// Extracted body widget to avoid rebuilding the entire tree unnecessarily.
+class _CourseDetailBody extends StatelessWidget {
+  final DiscoveryCourseModel course;
+  final bool isLoading;
+  final bool isEnrolled;
+  final String tenantId;
+  final String courseId;
+  final WidgetRef ref;
+
+  const _CourseDetailBody({
+    required this.course,
+    required this.isLoading,
+    required this.isEnrolled,
+    required this.tenantId,
+    required this.courseId,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // ── Scrollable content ──────────────────────────────────────────
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Hero image with gradient and title overlay ──────────
+                _HeroBanner(
+                  course: course,
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                  onBack: () => context.pop(),
+                ),
+                // ── Main content ────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Gap(24),
+                      _buildHeaderActionRow(context, course, colorScheme, textTheme),
+                      const Gap(32),
+                      _buildDescription(course, colorScheme, textTheme),
+                      const Gap(32),
+                      if (course.whatYouWillLearn.isNotEmpty)
+                        _buildSection(
+                          'What you will learn',
+                          _buildLearningPoints(course, colorScheme, textTheme),
+                          textTheme,
+                        ),
+                      const Gap(32),
+                      if (course.requirements.isNotEmpty)
+                        _buildSection(
+                          'Requirements',
+                          _buildRequirementsList(course, colorScheme, textTheme),
+                          textTheme,
+                        ),
+                      const Gap(32),
+                      if (course.learningMaterials.isNotEmpty)
+                        _buildSection(
+                          'This course includes',
+                          _buildMaterialsGrid(course, colorScheme, textTheme),
+                          textTheme,
+                        ),
+                      const Gap(120),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // ── Floating back button pinned over the hero ────────────────
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 12,
+            child: _FloatingBackButton(onTap: () => context.pop()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderActionRow(
+    BuildContext context,
+    DiscoveryCourseModel course,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final priceStr = course.price <= 0
+        ? 'Free'
+        : '${course.currency} ${course.price.toStringAsFixed(0)}';
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Full Course Price',
+                style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+              ),
+              Text(
+                priceStr,
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: course.thumbnailUrl != null
-            ? CachedNetworkImage(
-                imageUrl: course.thumbnailUrl!,
-                fit: BoxFit.cover,
-              )
-            : Container(color: colorScheme.surfaceContainerHighest),
-      ),
-    );
-  }
-
-  Widget _buildHeaderInfo(DiscoveryCourseModel course, ColorScheme colorScheme, TextTheme textTheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                course.courseCategory.isNotEmpty ? course.courseCategory.first : 'General',
-                style: textTheme.labelSmall?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const Gap(8),
-            if (course.courseType != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  course.courseType!.toUpperCase(),
-                  style: textTheme.labelSmall?.copyWith(color: colorScheme.secondary, fontWeight: FontWeight.bold),
-                ),
-              ),
-          ],
-        ),
-        const Gap(12),
-        Text(
-          course.title,
-          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
-        ),
         const Gap(16),
-        Row(
-          children: [
-            _buildMetaInfo(Icons.bar_chart_rounded, course.level ?? 'All Levels', textTheme, colorScheme),
-            const Gap(16),
-            _buildMetaInfo(Icons.access_time_rounded, course.duration ?? 'Self-paced', textTheme, colorScheme),
-            const Gap(16),
-            _buildMetaInfo(Icons.language_rounded, course.language ?? 'English', textTheme, colorScheme),
-          ],
+        SizedBox(
+          height: 52,
+          child: ElevatedButton(
+            onPressed: isLoading
+                ? null
+                : () {
+                    if (isEnrolled) {
+                      context.push('/platform/$tenantId/course/$courseId/overview');
+                    } else {
+                      ref.read(enrollmentControllerProvider.notifier).handleEnrollment(course);
+                    }
+                  },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(
+                    isEnrolled ? 'Continue' : (course.price <= 0 ? 'Enroll Now' : 'Buy Now'),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+          ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildMetaInfo(IconData icon, String label, TextTheme textTheme, ColorScheme colorScheme) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: colorScheme.onSurfaceVariant),
-        const Gap(6),
-        Text(label, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -255,85 +302,202 @@ class CourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildMaterialsGrid(DiscoveryCourseModel course, ColorScheme colorScheme, TextTheme textTheme) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 10,
+    return Column(
       children: course.learningMaterials.map((material) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.play_circle_outline_rounded, size: 16, color: colorScheme.onSurfaceVariant),
-            const Gap(6),
-            Text(material, style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500)),
-          ],
+        final iconData = _getMaterialIcon(material);
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          ),
+          child: Row(
+            children: [
+              HugeIcon(icon: iconData, color: colorScheme.primary, size: 24),
+              const Gap(16),
+              Expanded(
+                child: Text(
+                  material,
+                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
   }
 
-  Widget _buildBottomActionBar(
-    BuildContext context,
-    DiscoveryCourseModel course,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    WidgetRef ref,
-    bool isLoading,
-    bool isEnrolled,
-  ) {
-    final priceStr = course.price <= 0
-        ? 'Free'
-        : '${course.currency} ${course.price.toStringAsFixed(0)}';
+  dynamic _getMaterialIcon(String material) {
+    final m = material.toLowerCase();
+    if (m.contains('video') || m.contains('lesson')) return HugeIcons.strokeRoundedAudioBook01;
+    if (m.contains('pdf') || m.contains('resource') || m.contains('note')) return HugeIcons.strokeRoundedFolderLibrary;
+    if (m.contains('quiz') || m.contains('exam') || m.contains('test')) return HugeIcons.strokeRoundedDiscoverCircle;
+    if (m.contains('certificate')) return HugeIcons.strokeRoundedUser;
+    if (m.contains('lifetime') || m.contains('access')) return HugeIcons.strokeRoundedHome03;
+    return HugeIcons.strokeRoundedFolderLibrary;
+  }
+}
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+/// Hero image banner with gradient and course title.
+///
+/// Uses [CachedNetworkImage] which shares an in-memory cache with the
+/// course cards — so if the user tapped a card, the thumbnail is already
+/// in cache and renders instantly with zero flicker.
+class _HeroBanner extends StatelessWidget {
+  final DiscoveryCourseModel course;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final VoidCallback onBack;
+
+  const _HeroBanner({
+    required this.course,
+    required this.colorScheme,
+    required this.textTheme,
+    required this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValidThumbnail =
+        course.thumbnailUrl != null && course.thumbnailUrl!.isNotEmpty;
+
+    return SizedBox(
+      height: _kHeroHeight,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ── Thumbnail image (loads from cache instantly if card was shown) ─
+          if (hasValidThumbnail)
+            CachedNetworkImage(
+              imageUrl: course.thumbnailUrl!,
+              fit: BoxFit.cover,
+              // CachedNetworkImage returns the cached image synchronously on
+              // the next frame — no flicker when navigating from the card.
+              fadeInDuration: Duration.zero,
+              placeholderFadeInDuration: Duration.zero,
+              placeholder: (context, url) => Container(
+                color: colorScheme.surfaceContainerHighest,
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: colorScheme.surfaceContainerHighest,
+                child: Center(
+                  child: HugeIcon(
+                    icon: HugeIcons.strokeRoundedImage01,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 40,
+                  ),
+                ),
+              ),
+            )
+          else
+            Container(
+              color: colorScheme.surfaceContainerHighest,
+              child: Center(
+                child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedImage01,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 40,
+                ),
+              ),
+            ),
+
+          // ── Gradient overlay for readability ───────────────────────────
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.black26, Colors.transparent, Colors.transparent, Colors.black54],
+                stops: [0.0, 0.3, 0.6, 1.0],
+              ),
+            ),
+          ),
+
+          // ── Course title and badges at the bottom ─────────────────────
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Total Price', style: textTheme.bodySmall),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                      ),
+                      child: Text(
+                        course.courseCategory.isNotEmpty ? course.courseCategory.first : 'General',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (course.courseType != null) ...[
+                      const Gap(8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          course.courseType!.toUpperCase(),
+                          style: textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const Gap(8),
                 Text(
-                  priceStr,
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, color: colorScheme.primary),
+                  course.title,
+                  style: textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-            const Gap(24),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        if (isEnrolled) {
-                          context.push(
-                            '/platform/$tenantId/course/$courseId/curriculum',
-                          );
-                        } else {
-                          ref
-                              .read(enrollmentControllerProvider.notifier)
-                              .handleEnrollment(course);
-                        }
-                      },
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        isEnrolled
-                            ? 'Continue Learning'
-                            : (course.price <= 0 ? 'Enroll Now' : 'Buy Now'),
-                      ),
-              ),
-            ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Small circular back button floating over the hero banner.
+class _FloatingBackButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _FloatingBackButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black26,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
         ),
       ),
     );

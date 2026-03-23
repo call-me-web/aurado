@@ -13,6 +13,8 @@ class ThemeState {
     this.quaternaryColor = ThemeConfig.quaternary,
     this.fontFamily = ThemeConfig.fontFamily,
     this.themeMode = ThemeMode.system,
+    this.backgroundColor,
+    this.cardColor,
   });
 
   final Color primaryColor;
@@ -21,6 +23,8 @@ class ThemeState {
   final Color quaternaryColor;
   final String fontFamily;
   final ThemeMode themeMode;
+  final Color? backgroundColor;
+  final Color? cardColor;
 
   ThemeState copyWith({
     Color? primaryColor,
@@ -29,6 +33,8 @@ class ThemeState {
     Color? quaternaryColor,
     String? fontFamily,
     ThemeMode? themeMode,
+    Color? backgroundColor,
+    Color? cardColor,
   }) {
     return ThemeState(
       primaryColor: primaryColor ?? this.primaryColor,
@@ -37,8 +43,35 @@ class ThemeState {
       quaternaryColor: quaternaryColor ?? this.quaternaryColor,
       fontFamily: fontFamily ?? this.fontFamily,
       themeMode: themeMode ?? this.themeMode,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      cardColor: cardColor ?? this.cardColor,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThemeState &&
+          runtimeType == other.runtimeType &&
+          primaryColor == other.primaryColor &&
+          secondaryColor == other.secondaryColor &&
+          tertiaryColor == other.tertiaryColor &&
+          quaternaryColor == other.quaternaryColor &&
+          fontFamily == other.fontFamily &&
+          themeMode == other.themeMode &&
+          backgroundColor == other.backgroundColor &&
+          cardColor == other.cardColor;
+
+  @override
+  int get hashCode =>
+      primaryColor.hashCode ^
+      secondaryColor.hashCode ^
+      tertiaryColor.hashCode ^
+      quaternaryColor.hashCode ^
+      fontFamily.hashCode ^
+      themeMode.hashCode ^
+      backgroundColor.hashCode ^
+      cardColor.hashCode;
 }
 
 /// A Notifier to manage the active [ThemeState].
@@ -49,20 +82,30 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   /// Update the current theme based on fetched tenant branding.
+  /// 
+  /// Only updates if the values have actually changed to prevent redundant rebuilds.
   void updateTheme({
     Color? primaryColor,
     Color? secondaryColor,
     Color? tertiaryColor,
     Color? quaternaryColor,
     String? fontFamily,
+    Color? backgroundColor,
+    Color? cardColor,
   }) {
-    state = state.copyWith(
-      primaryColor: primaryColor ?? ThemeConfig.primary,
-      secondaryColor: secondaryColor ?? ThemeConfig.secondary,
-      tertiaryColor: tertiaryColor ?? ThemeConfig.tertiary,
-      quaternaryColor: quaternaryColor ?? ThemeConfig.quaternary,
-      fontFamily: fontFamily ?? ThemeConfig.fontFamily,
+    final newState = state.copyWith(
+      primaryColor: primaryColor,
+      secondaryColor: secondaryColor,
+      tertiaryColor: tertiaryColor,
+      quaternaryColor: quaternaryColor,
+      fontFamily: fontFamily,
+      backgroundColor: backgroundColor,
+      cardColor: cardColor,
     );
+
+    if (state != newState) {
+      state = newState;
+    }
   }
 
   /// Reset the theme to its default Aurado values.

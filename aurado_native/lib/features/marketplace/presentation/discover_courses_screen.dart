@@ -10,6 +10,8 @@ import 'package:hugeicons/hugeicons.dart';
 import 'dart:ui';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../shared/widgets/performance_blur.dart';
+import '../../../core/performance/performance_provider.dart';
 
 class DiscoverCoursesScreen extends ConsumerStatefulWidget {
   const DiscoverCoursesScreen({super.key});
@@ -38,6 +40,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final performance = ref.watch(performanceProvider);
 
     final popularCategoriesAsync = ref.watch(popularCategoriesProvider);
 
@@ -46,13 +49,12 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 20,
-        backgroundColor: colorScheme.surface.withValues(alpha: 0.05),
+        backgroundColor: performance.enableGlassmorphism
+            ? colorScheme.surface.withValues(alpha: 0.05)
+            : colorScheme.surface,
         elevation: 0,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: Container(color: Colors.transparent),
-          ),
+        flexibleSpace: PerformanceBlur(
+          child: Container(color: Colors.transparent),
         ),
         title: Row(
           children: [
@@ -69,7 +71,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                   _searchFocusNode.unfocus();
                 },
                 child: SizedBox(
-                  height: 44, // sleek, compact height
+                  height: 48, // slightly more room for layout stability
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
@@ -110,7 +112,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                           : colorScheme.surfaceContainerHighest,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 0,
+                        vertical: 8,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(100),
@@ -248,7 +250,7 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                     ],
                   ),
                   child: Center(
-                    child: tenant.logoUrl != null
+                    child: (tenant.logoUrl != null && tenant.logoUrl!.isNotEmpty)
                         ? ClipOval(
                             child: CachedNetworkImage(
                               imageUrl: tenant.logoUrl!,
@@ -259,6 +261,10 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
                                 baseColor: colorScheme.surfaceContainerHighest,
                                 highlightColor: colorScheme.surface,
                                 child: Container(color: colorScheme.surface),
+                              ),
+                              errorWidget: (context, url, err) => Icon(
+                                Icons.business,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                           )

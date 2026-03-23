@@ -117,20 +117,22 @@ class PlatformHomeScreen extends ConsumerWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (tenant.coverUrl != null)
-                CachedNetworkImage(
-                  imageUrl: tenant.coverUrl!,
-                  fit: BoxFit.cover,
-                )
-              else
-                Container(color: colorScheme.primary.withValues(alpha: 0.2)),
+              Positioned.fill(
+                child: (tenant.coverUrl != null && tenant.coverUrl!.isNotEmpty)
+                    ? CachedNetworkImage(
+                        imageUrl: tenant.coverUrl!,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(color: colorScheme.surface),
+                      )
+                    : Container(color: colorScheme.surface),
+              ),
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.3),
+                      Colors.black.withOpacity(0.3),
                       Colors.transparent,
                       colorScheme.surface,
                     ],
@@ -162,20 +164,29 @@ class PlatformHomeScreen extends ConsumerWidget {
                     border: Border.all(color: colorScheme.surface, width: 4),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: tenant.logoUrl != null
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: (tenant.logoUrl != null && tenant.logoUrl!.isNotEmpty)
                         ? ClipOval(
                             child: CachedNetworkImage(
                               imageUrl: tenant.logoUrl!,
-                              width: 60,
-                              height: 60,
+                              width: 80,
+                              height: 80,
                               fit: BoxFit.contain,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.business,
+                                color: colorScheme.primary,
+                                size: 40,
+                              ),
                             ),
                           )
                         : Icon(Icons.business, size: 40, color: colorScheme.onSurfaceVariant),

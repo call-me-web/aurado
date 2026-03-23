@@ -22,8 +22,8 @@ class AuradoTheme {
     final tertiary = state?.tertiaryColor ?? ThemeConfig.tertiary;
     final fontFamily = state?.fontFamily ?? ThemeConfig.fontFamily;
 
-    final background = isDark ? ThemeConfig.darkBackground : ThemeConfig.lightBackground;
-    final surface = isDark ? ThemeConfig.darkSurface : ThemeConfig.lightSurface;
+    final background = state?.backgroundColor ?? (isDark ? ThemeConfig.darkBackground : ThemeConfig.lightBackground);
+    final surface = state?.cardColor ?? (isDark ? ThemeConfig.darkSurface : ThemeConfig.lightSurface);
     final surfaceElevated = isDark ? ThemeConfig.darkSurfaceElevated : ThemeConfig.lightSurfaceElevated;
     final divider = isDark ? ThemeConfig.darkDivider : ThemeConfig.lightDivider;
     final onBackground = isDark ? ThemeConfig.onDarkBackground : ThemeConfig.onLightBackground;
@@ -253,20 +253,19 @@ class NavBarTheme extends ThemeExtension<NavBarTheme> {
   NavBarTheme lerp(ThemeExtension<NavBarTheme>? other, double t) {
     if (other is! NavBarTheme) return this;
     return NavBarTheme(
-      activeColor: Color.lerp(activeColor, other.activeColor, t)!,
-      glassOpacity: lerpDouble(glassOpacity, other.glassOpacity, t)!,
-      blur: lerpDouble(blur, other.blur, t)!,
-      strokeWidth: lerpDouble(strokeWidth, other.strokeWidth, t)!,
-      strokeColor: Color.lerp(strokeColor, other.strokeColor, t)!,
-      unselectedColor: Color.lerp(unselectedColor, other.unselectedColor, t)!,
+      activeColor: Color.lerp(activeColor, other.activeColor, t) ?? activeColor,
+      glassOpacity: _lerpDouble(glassOpacity, other.glassOpacity, t),
+      blur: _lerpDouble(blur, other.blur, t),
+      strokeWidth: _lerpDouble(strokeWidth, other.strokeWidth, t),
+      strokeColor: Color.lerp(strokeColor, other.strokeColor, t) ?? strokeColor,
+      unselectedColor: Color.lerp(unselectedColor, other.unselectedColor, t) ?? unselectedColor,
     );
   }
 
-  double? lerpDouble(double? a, double? b, double t) {
-    if (a == null && b == null) return null;
-    a ??= 0.0;
-    b ??= 0.0;
-    return a + (b - a) * t;
+  double _lerpDouble(double? a, double? b, double t) {
+    final start = a ?? 0.0;
+    final end = b ?? 0.0;
+    return start + (end - start) * t;
   }
 }
 

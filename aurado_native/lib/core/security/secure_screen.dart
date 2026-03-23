@@ -1,15 +1,16 @@
-import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../performance/performance_provider.dart';
+import '../../shared/widgets/performance_blur.dart';
 import 'dynamic_watermark.dart';
 
 /// Applies native screen-capture prevention, lifecycle blur in App Switcher,
 /// and dynamic watermarks to a sensitive widget subtree.
-class SecureScreen extends StatefulWidget {
+class SecureScreen extends ConsumerStatefulWidget {
   const SecureScreen({
     required this.child,
-    this.userName = 'Demo User',       // Will be fetched from Auth state in future
+    this.userName = 'Demo User', // Will be fetched from Auth state in future
     this.userPhone = '+880170000000',
     this.userId = 'UID-0000-0000',
     super.key,
@@ -21,10 +22,11 @@ class SecureScreen extends StatefulWidget {
   final String userId;
 
   @override
-  State<SecureScreen> createState() => _SecureScreenState();
+  ConsumerState<SecureScreen> createState() => _SecureScreenState();
 }
 
-class _SecureScreenState extends State<SecureScreen> with WidgetsBindingObserver {
+class _SecureScreenState extends ConsumerState<SecureScreen>
+    with WidgetsBindingObserver {
   static const _channel = MethodChannel('com.aurado/security');
 
   bool _isSecure = false;
@@ -47,7 +49,8 @@ class _SecureScreenState extends State<SecureScreen> with WidgetsBindingObserver
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If the app is inactive (App Switcher) or paused, blur the screen.
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
       if (!_isAppBackgrounded) {
         setState(() => _isAppBackgrounded = true);
       }
@@ -86,6 +89,8 @@ class _SecureScreenState extends State<SecureScreen> with WidgetsBindingObserver
       child: widget.child,
     );
 
+    final performance = ref.watch(performanceProvider);
+
     // Apply strict blur if app is sent to background (App Switcher view protection)
     return Stack(
       fit: StackFit.passthrough,
@@ -93,17 +98,17 @@ class _SecureScreenState extends State<SecureScreen> with WidgetsBindingObserver
         content,
         if (_isAppBackgrounded)
           Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.security,
-                    color: Colors.white,
-                    size: 64,
-                  ),
+            child: PerformanceBlur(
+              blur: 20,
+              child: Container(
+                color: performance.enableGlassmorphism
+                    ? Colors.black.withValues(alpha: 0.5)
+                    : Colors.black, // Solid black if we can't blur
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.security,
+                  color: Colors.white,
+                  size: 64,
                 ),
               ),
             ),

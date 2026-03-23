@@ -5,8 +5,10 @@ import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:aurado/features/marketplace/providers/marketplace_provider.dart';
 
-class MarketplaceCourseCard extends StatefulWidget {
+class MarketplaceCourseCard extends ConsumerStatefulWidget {
   final DiscoveryCourseModel course;
   final VoidCallback? onTap;
   final bool isExpanded;
@@ -21,10 +23,10 @@ class MarketplaceCourseCard extends StatefulWidget {
   });
 
   @override
-  State<MarketplaceCourseCard> createState() => _MarketplaceCourseCardState();
+  ConsumerState<MarketplaceCourseCard> createState() => _MarketplaceCourseCardState();
 }
 
-class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
+class _MarketplaceCourseCardState extends ConsumerState<MarketplaceCourseCard> {
   String _formatPrice() {
     if (widget.course.price <= 0) return 'Free';
     final hasDecimals =
@@ -48,9 +50,17 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
 
     return GestureDetector(
       onTap: () {
-        context.push(
-          '/platform/${widget.course.tenantId}/course/${widget.course.id}',
-        );
+        final enrolledAsync = ref.read(enrolledCoursesProvider);
+        if (enrolledAsync.isLoading) {
+          context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}');
+        } else {
+          final isEnrolled = enrolledAsync.asData?.value.any((c) => c.id == widget.course.id) ?? false;
+          if (isEnrolled) {
+            context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}/overview');
+          } else {
+            context.push('/app/discover-courses/details/${widget.course.tenantId}/${widget.course.id}');
+          }
+        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -94,7 +104,7 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
       children: [
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: widget.course.thumbnailUrl != null
+          child: (widget.course.thumbnailUrl != null && widget.course.thumbnailUrl!.isNotEmpty)
               ? CachedNetworkImage(
                   imageUrl: widget.course.thumbnailUrl!,
                   fit: BoxFit.cover,
@@ -203,10 +213,10 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: colorScheme.surfaceContainerHighest,
-                  backgroundImage: widget.course.tenantLogoUrl != null
+                  backgroundImage: (widget.course.tenantLogoUrl != null && widget.course.tenantLogoUrl!.isNotEmpty)
                       ? CachedNetworkImageProvider(widget.course.tenantLogoUrl!)
                       : null,
-                  child: widget.course.tenantLogoUrl == null
+                  child: (widget.course.tenantLogoUrl == null || widget.course.tenantLogoUrl!.isEmpty)
                       ? Icon(
                           Icons.business,
                           size: 12,
@@ -505,7 +515,20 @@ class _MarketplaceCourseCardState extends State<MarketplaceCourseCard> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onTap ?? () {},
+                  onPressed: widget.onTap ??
+                      () {
+                        final enrolledAsync = ref.read(enrolledCoursesProvider);
+                        if (enrolledAsync.isLoading) {
+                          context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}');
+                        } else {
+                          final isEnrolled = enrolledAsync.asData?.value.any((c) => c.id == widget.course.id) ?? false;
+                          if (isEnrolled) {
+                            context.push('/platform/${widget.course.tenantId}/course/${widget.course.id}/overview');
+                          } else {
+                            context.push('/app/discover-courses/details/${widget.course.tenantId}/${widget.course.id}');
+                          }
+                        }
+                      },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),

@@ -10,6 +10,12 @@ import 'features/onboarding/providers/onboarding_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('CRITICAL ERROR: ${details.exception}');
+    debugPrint('STACK TRACE: ${details.stack}');
+  };
 
   // ── Load environment variables ────────────────────────────
   await dotenv.load(fileName: '.env');

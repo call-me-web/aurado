@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'dart:ui';
+
+import '../../../shared/widgets/performance_blur.dart';
+import '../../../core/performance/performance_provider.dart';
 
 class MyCoursesScreen extends ConsumerStatefulWidget {
   const MyCoursesScreen({super.key});
@@ -24,19 +26,19 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final performance = ref.watch(performanceProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 20,
-        backgroundColor: colorScheme.surface.withValues(alpha: 0.05),
+        backgroundColor: performance.enableGlassmorphism
+            ? colorScheme.surface.withValues(alpha: 0.05)
+            : colorScheme.surface,
         elevation: 0,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: Container(color: Colors.transparent),
-          ),
+        flexibleSpace: PerformanceBlur(
+          child: Container(color: Colors.transparent),
         ),
         title: Text(
           'My Courses',

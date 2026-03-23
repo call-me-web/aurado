@@ -76,7 +76,7 @@ FutureOr<List<String>> popularCategories(Ref ref) async {
       return sortedEntries.take(6).map((e) => e.key).toList();
     },
     loading: () => [],
-    error: (_, __) => [],
+    error: (err, stack) => [],
   );
 }
 

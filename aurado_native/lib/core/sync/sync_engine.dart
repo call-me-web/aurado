@@ -4,6 +4,7 @@ import 'package:aurado/features/sync/domain/repositories/backup_repository.dart'
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// The entry point for background tasks. 
 /// Must be a top-level function for Workmanager to find it.
@@ -15,6 +16,7 @@ void callbackDispatcher() {
     try {
       // 1. Re-initialize dependencies for the new isolate.
       // We wrap it in a try-catch to ensure the isolate doesn't crash silently.
+      await dotenv.load(fileName: '.env');
       await initDependencies();
       
       final syncRepo = sl<SyncRepository>();

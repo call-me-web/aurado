@@ -1,0 +1,29 @@
+Analyzing aurado_native...                                      
+
+   info • Don't invoke 'print' in production code • lib/core/network/signed_url_resolver.dart:71:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/core/network/signed_url_resolver.dart:73:7 • avoid_print
+   info • The 'child' argument should be last in widget constructor invocations • lib/core/router/app_router.dart:286:13 • sort_child_properties_last
+   info • Unnecessary override • lib/core/router/course_context_shell.dart:51:8 • unnecessary_overrides
+   info • Statements in an if should be enclosed in a block • lib/features/exams/presentation/pages/mcq_screen.dart:175:7 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/home/presentation/home_screen.dart:91:39 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/home/presentation/home_screen.dart:148:32 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/home/presentation/home_screen.dart:150:51 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/features/learning/data/repositories/drift_intelligence_repository.dart:102:28 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/learning/data/repositories/drift_intelligence_repository.dart:103:33 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/learning/data/repositories/drift_intelligence_repository.dart:104:34 • curly_braces_in_flow_control_structures
+warning • Unused import: 'package:aurado/features/learning/domain/models/lesson_model.dart' • lib/features/learning/presentation/pages/pdf_viewer_screen.dart:1:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/features/marketplace/presentation/discover_courses_screen.dart:10:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/marketplace/presentation/marketplace_screen.dart:127:43 • deprecated_member_use
+   info • Missing type annotation • lib/features/marketplace/presentation/marketplace_screen.dart:165:35 • strict_top_level_inference
+warning • Unused import: 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart' • lib/features/marketplace/presentation/my_courses_screen.dart:1:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/features/marketplace/presentation/my_courses_screen.dart:8:8 • unnecessary_import
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/course_detail_screen.dart:29:5 • avoid_print
+   info • Unnecessary use of multiple underscores • lib/features/marketplace/presentation/pages/tenant_context/course_detail_screen.dart:57:18 • unnecessary_underscores
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/course_detail_screen.dart:66:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart:51:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart:64:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart:95:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart:96:7 • avoid_print
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/marketplace/presentation/pages/tenant_context/lesson_player_screen.dart:528:47 • deprecated_member_use
+   info • Unnecessary use of multiple underscores • lib/features/marketplace/providers/marketplace_provider.dart:79:16 • unnecessary_underscores
+
