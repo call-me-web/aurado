@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:aurado/core/local_storage/drift_database.dart';
 import 'package:aurado/features/sync/domain/repositories/sync_repository.dart';
 import 'package:drift/drift.dart';
@@ -17,7 +16,9 @@ class SyncRepositoryImpl implements SyncRepository {
           ..where((t) => t.isSynced.equals(false)))
         .get();
 
-    if (unsynced.isEmpty) return;
+    if (unsynced.isEmpty) {
+      return;
+    }
 
     for (final row in unsynced) {
       try {
@@ -38,8 +39,7 @@ class SyncRepositoryImpl implements SyncRepository {
             .write(const LocalLessonMasteryCompanion(isSynced: Value(true)));
             
       } catch (e) {
-        // Log error but continue with other rows
-        debugPrint('SYNC ERROR for lesson ${row.lessonId}: $e');
+        // Silently continue for individual sync failures
       }
     }
   }

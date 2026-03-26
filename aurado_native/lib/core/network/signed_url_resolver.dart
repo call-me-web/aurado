@@ -66,11 +66,10 @@ class SignedUrlResolver {
         final signedUrl = response.data['signedUrl'] as String?;
         return signedUrl ?? url;
       }
-    } on DioException catch (e) {
+    } on DioException {
       // Log errors but return original URL as fallback
-      print('[SignedUrlResolver] Error: ${e.response?.statusCode} ${e.response?.data}');
     } catch (e) {
-      print('[SignedUrlResolver] Unexpected error: $e');
+      // Fallback
     }
 
     return url;

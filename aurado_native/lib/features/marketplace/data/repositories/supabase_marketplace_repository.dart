@@ -3,7 +3,6 @@ import 'package:aurado/core/constants/app_constants.dart';
 import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
 import 'package:aurado/features/marketplace/domain/models/tenant_model.dart';
 import 'package:aurado/features/marketplace/domain/repositories/marketplace_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseMarketplaceRepository implements MarketplaceRepository {
@@ -42,7 +41,6 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
       }
       throw Exception(response.data['error'] ?? 'Failed to initialize payment');
     } catch (e) {
-      debugPrint('initializePayment Error: $e');
       rethrow;
     }
   }
@@ -65,7 +63,6 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
 
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
-      debugPrint('enrollFree Error: $e');
       rethrow;
     }
   }
@@ -169,7 +166,6 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
   @override
   Future<List<DiscoveryCourseModel>> getEnrolledCourses() async {
     try {
-      debugPrint('SupabaseMarketplaceRepository: getEnrolledCourses called');
       final session = _supabase.auth.currentSession;
       if (session == null) throw Exception('User not authenticated');
 
@@ -199,7 +195,6 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
       }
       throw Exception('Failed to fetch enrolled courses');
     } catch (e) {
-      debugPrint('getEnrolledCourses Error: $e');
       rethrow;
     }
   }
@@ -232,7 +227,6 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
         final publicPath = pathSegments.join('/');
         return '$_r2PublicBaseUrl/$publicPath';
       } catch (e) {
-        debugPrint('_normalizeR2Url: failed to parse "$url": $e');
         return url;
       }
     }

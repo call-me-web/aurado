@@ -9,6 +9,54 @@ part of 'learning_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(curriculumRepository)
+final curriculumRepositoryProvider = CurriculumRepositoryProvider._();
+
+final class CurriculumRepositoryProvider
+    extends
+        $FunctionalProvider<
+          CurriculumRepository,
+          CurriculumRepository,
+          CurriculumRepository
+        >
+    with $Provider<CurriculumRepository> {
+  CurriculumRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'curriculumRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$curriculumRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<CurriculumRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CurriculumRepository create(Ref ref) {
+    return curriculumRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CurriculumRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CurriculumRepository>(value),
+    );
+  }
+}
+
+String _$curriculumRepositoryHash() =>
+    r'd52b0f96fad9d0bf05c940d92bdafd82fe759d26';
+
 @ProviderFor(curriculum)
 final curriculumProvider = CurriculumFamily._();
 
@@ -66,7 +114,7 @@ final class CurriculumProvider
   }
 }
 
-String _$curriculumHash() => r'610c71ee66ae58af15813d0ce2681c8db64dd93e';
+String _$curriculumHash() => r'966045dea631aa940a5ae3e60098d53740be0624';
 
 final class CurriculumFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<SubjectModel>>, String> {

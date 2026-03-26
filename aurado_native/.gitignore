@@ -33,6 +33,10 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Local environment secrets
+.env
+lib/core/constants/env_secrets.dart
+
 # Symbolication related
 app.*.symbols
 

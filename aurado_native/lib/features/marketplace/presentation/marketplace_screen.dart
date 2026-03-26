@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -124,7 +125,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -162,7 +163,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     );
   }
 
-  Widget _buildVerticalCourseList(courses) {
+  Widget _buildVerticalCourseList(List<DiscoveryCourseModel> courses) {
     if (courses.isEmpty) {
       return const Center(
         child: Padding(

@@ -32,6 +32,19 @@ Aurado is a production-grade educational platform built with a **"Local-First, E
 - **Background Tasks**: Workmanager
 - **Security**: AES-256 Encryption, Flutter Secure Storage
 
+## 🔐 Environment Setup (Rule 54)
+
+Aurado Native strictly enforces that no secrets are committed to the repository. The app expects a `.env` file at the root.
+
+**1. Create your `.env`:**
+Place a `.env` file in the root with your credentials (e.g. `VITE_SUPABASE_URL=...`).
+
+**2. Running the app:**
+- **Terminal**: Use `make run` to inject variables during development.
+- **VS Code**: Use the pre-configured *Run Aurado (with .env)* launch configuration from the Debug tab.
+
+*Note: For manual builds, ensure you use `--dart-define-from-file=.env`. Or run `dart scripts/inject_env.dart` to generate a fallback `env_secrets.dart` file.*
+
 ## 🏗 Architecture
 Aurado follows **Clean Architecture** principles:
 - **domain/**: Pure business logic (Models, Repository Interfaces).

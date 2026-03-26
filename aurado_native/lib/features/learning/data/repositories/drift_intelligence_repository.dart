@@ -99,9 +99,13 @@ class DriftIntelligenceRepository implements IntelligenceRepository {
     double priority = 0.5;
     if (examDate != null) {
       final daysToExam = examDate.difference(DateTime.now()).inDays;
-      if (daysToExam <= 3) priority = 0.95;
-      else if (daysToExam <= 7) priority = 0.8;
-      else if (daysToExam <= 14) priority = 0.65;
+      if (daysToExam <= 3) {
+        priority = 0.95;
+      } else if (daysToExam <= 7) {
+        priority = 0.8;
+      } else if (daysToExam <= 14) {
+        priority = 0.65;
+      }
     }
 
     final companion = LocalSmartReviewQueueCompanion(

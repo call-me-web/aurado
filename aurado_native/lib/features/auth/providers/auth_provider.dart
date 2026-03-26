@@ -1,10 +1,13 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:aurado/core/di/service_locator.dart';
+import 'package:aurado/core/di/provider_registry.dart';
 import 'package:aurado/features/auth/domain/models/user_model.dart';
 import 'package:aurado/features/auth/domain/repositories/auth_repository.dart';
+import 'package:aurado/features/auth/data/repositories/supabase_auth_repository.dart';
 import 'package:aurado/features/sync/domain/repositories/backup_repository.dart';
+import 'package:aurado/features/sync/data/repositories/supabase_backup_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'auth_provider.g.dart';
 
 /// Represents the possible states of authentication.
 enum AuthStatus {
@@ -44,48 +47,44 @@ class AuthStateData {
 }
 
 /// Manages global authentication logic and state.
-class AuthNotifier extends Notifier<AuthStateData> {
-  AuthRepository get _repository => sl.get<AuthRepository>();
-  BackupRepository get _backupRepository => sl.get<BackupRepository>();
+@Riverpod(keepAlive: true)
+class Auth extends _$Auth {
+  AuthRepository get _repository => ref.watch(authRepositoryProvider);
+  BackupRepository get _backupRepository => ref.watch(backupRepositoryProvider);
   StreamSubscription<UserModel?>? _subscription;
 
   @override
   AuthStateData build() {
-    debugPrint('DEBUG: AuthNotifier build() START');
     
     // Listen to real-time auth changes from Supabase
     _subscription?.cancel();
     _subscription = _repository.authStateChanges().listen((user) {
-      debugPrint('DEBUG: AuthStateChange - User: ${user?.id}');
       if (user != null) {
         _handlePostAuth(user);
       } else {
         state = AuthStateData.unauthenticated();
       }
     }, onError: (e) {
-      debugPrint('DEBUG: ERROR in AuthStateChange stream: $e');
+      // Silence stream errors in production
     });
 
     // Check pre-existing session
     _checkInitialAuth();
 
-    debugPrint('DEBUG: AuthNotifier build() returning INITIAL');
+    _checkInitialAuth();
+
     return AuthStateData.initial();
   }
 
   Future<void> _checkInitialAuth() async {
-    debugPrint('DEBUG: Checking initial auth...');
     try {
       final user = await _repository.getCurrentUser();
-      debugPrint('DEBUG: Initial auth check complete - User: ${user?.id}');
       if (user != null) {
         _handlePostAuth(user);
       } else {
         state = AuthStateData.unauthenticated();
       }
-    } catch (e, stack) {
-      debugPrint('DEBUG: ERROR in _checkInitialAuth: $e');
-      debugPrint('DEBUG: StackTrace: $stack');
+    } catch (e) {
       state = AuthStateData.unauthenticated();
     }
   }
@@ -164,7 +163,7 @@ class AuthNotifier extends Notifier<AuthStateData> {
         state = AuthStateData.authenticated(user, canRestore: true);
       }
     } catch (e) {
-      debugPrint('DEBUG: Error checking backup: $e');
+      // Background check failed silently
     }
   }
 
@@ -182,7 +181,15 @@ class AuthNotifier extends Notifier<AuthStateData> {
   }
 }
 
-/// Global provider for checking Auth state and performing login/logout.
-final authProvider = NotifierProvider<AuthNotifier, AuthStateData>(() {
-  return AuthNotifier();
-});
+@riverpod
+AuthRepository authRepository(Ref ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  return SupabaseAuthRepository(supabase);
+}
+
+@riverpod
+BackupRepository backupRepository(Ref ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  final db = ref.watch(appDatabaseProvider);
+  return SupabaseBackupRepository(db, supabase);
+}

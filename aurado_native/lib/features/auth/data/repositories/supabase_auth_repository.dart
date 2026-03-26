@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:aurado/features/auth/domain/models/user_model.dart';
 import 'package:aurado/features/auth/domain/repositories/auth_repository.dart';
@@ -72,9 +71,7 @@ class SupabaseAuthRepository implements AuthRepository {
         }).timeout(const Duration(seconds: 5));
         return; // Success — exit early.
       } catch (e) {
-        debugPrint(
-          'DEBUG: Student record upsert attempt $attempt/$maxAttempts failed: $e',
-        );
+        // Silence retry logs
         if (attempt == maxAttempts) rethrow;
         // Exponential backoff before the next attempt.
         await Future.delayed(baseDelay * attempt);
@@ -166,7 +163,6 @@ class SupabaseAuthRepository implements AuthRepository {
       
       // 1. Fetch Profile (with a short retry for newly signed-up users)
       try {
-        debugPrint('DEBUG: _fetchFullUser - START profiles query for $userId');
         profileData = await _client
             .from('profiles')
             .select()
@@ -176,7 +172,6 @@ class SupabaseAuthRepository implements AuthRepository {
             
         if (profileData == null) {
           // If profile is missing, it might be due to a slow DB trigger. Wait and retry once.
-          debugPrint('DEBUG: Profile not found, waiting for trigger...');
           await Future.delayed(const Duration(milliseconds: 1000));
           profileData = await _client
               .from('profiles')
@@ -186,13 +181,12 @@ class SupabaseAuthRepository implements AuthRepository {
               .timeout(const Duration(seconds: 3));
         }
       } catch (e) {
-        debugPrint('DEBUG: Profile query failed/timed out: $e');
+        // Trace error silently
       }
 
       // 2. Fetch Student data
       Map<String, dynamic>? studentData;
       try {
-        debugPrint('DEBUG: _fetchFullUser - START students query for $userId');
         studentData = await _client
             .from('students')
             .select('education_level, language_preference, country, streak_count')
@@ -200,11 +194,10 @@ class SupabaseAuthRepository implements AuthRepository {
             .maybeSingle()
             .timeout(const Duration(seconds: 3));
       } catch (e) {
-        debugPrint('DEBUG: Student query failed/timed out: $e');
+        // Trace error silently
       }
 
       final isFound = profileData != null || studentData != null;
-      debugPrint('DEBUG: _fetchFullUser complete - Found: $isFound');
 
       return UserModel.fromMap({
         ...?profileData,
@@ -215,9 +208,8 @@ class SupabaseAuthRepository implements AuthRepository {
         'country': studentData?['country'],
         'streak_count': studentData?['streak_count'],
       });
-    } catch (e, stack) {
-      debugPrint('DEBUG: _fetchFullUser CRITICAL ERROR: $e');
-      debugPrint('DEBUG: StackTrace: $stack');
+    } catch (e) {
+      // Background fetch failed
       
       return UserModel(
         id: userId,

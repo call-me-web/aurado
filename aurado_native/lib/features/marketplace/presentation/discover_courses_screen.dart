@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'dart:ui';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../shared/widgets/performance_blur.dart';
@@ -295,9 +294,6 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
     );
   }
 
-  // Tracks which course index is currently expanded
-  int? _expandedIndex;
-
   Widget _buildVerticalCourseList(List<DiscoveryCourseModel> courses) {
     if (courses.isEmpty) {
       return const Center(
@@ -314,22 +310,8 @@ class _DiscoverCoursesScreenState extends ConsumerState<DiscoverCoursesScreen> {
       itemCount: courses.length,
       separatorBuilder: (context, index) => const Gap(20),
       itemBuilder: (context, index) {
-        final isExpanded = _expandedIndex == index;
-
         return MarketplaceCourseCard(
           course: courses[index],
-          isExpanded: isExpanded,
-          onToggleExpanded: () {
-            setState(() {
-              if (isExpanded) {
-                // If the user clicks the currently expanded card, close it
-                _expandedIndex = null;
-              } else {
-                // Otherwise expand the new card and auto-close the others
-                _expandedIndex = index;
-              }
-            });
-          },
         );
       },
     );

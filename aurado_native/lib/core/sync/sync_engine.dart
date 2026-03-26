@@ -2,21 +2,16 @@ import 'package:aurado/core/di/service_locator.dart';
 import 'package:aurado/features/sync/domain/repositories/sync_repository.dart';
 import 'package:aurado/features/sync/domain/repositories/backup_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// The entry point for background tasks. 
 /// Must be a top-level function for Workmanager to find it.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    debugPrint('BG_SYNC: Task started - $task');
-    
     try {
       // 1. Re-initialize dependencies for the new isolate.
       // We wrap it in a try-catch to ensure the isolate doesn't crash silently.
-      await dotenv.load(fileName: '.env');
       await initDependencies();
       
       final syncRepo = sl<SyncRepository>();
@@ -31,14 +26,10 @@ void callbackDispatcher() {
       final studentId = sl<SupabaseClient>().auth.currentUser?.id;
       if (studentId != null) {
         await sl<BackupRepository>().createBackup(studentId);
-        debugPrint('BG_SYNC: Backup created successfully.');
       }
       
-      debugPrint('BG_SYNC: Task completed successfully.');
       return true;
-    } catch (e, stack) {
-      debugPrint('BG_SYNC ERROR: $e');
-      debugPrint('BG_SYNC STACK: $stack');
+    } catch (e) {
       return false;
     }
   });
@@ -53,7 +44,6 @@ class SyncEngine {
     await Workmanager().initialize(
       callbackDispatcher,
     );
-    debugPrint('BG_SYNC: Workmanager initialized.');
   }
 
   /// Schedules a periodic sync task.
@@ -69,7 +59,6 @@ class SyncEngine {
       ),
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
-    debugPrint('BG_SYNC: Periodic task scheduled.');
   }
 
   /// Manually triggers an immediate background sync.

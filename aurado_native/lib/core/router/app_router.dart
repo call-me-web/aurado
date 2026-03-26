@@ -70,7 +70,9 @@ class RouterRefreshListenable extends ChangeNotifier {
     ref.listen(authProvider, (previous, next) => notifyListeners());
     ref.listen(onboardingProvider, (previous, next) => notifyListeners());
     ref.listen(personalizationProvider, (previous, next) => notifyListeners());
-    ref.listen(enrolledCoursesProvider, (previous, next) => notifyListeners());
+    ref.listen(enrolledCoursesProvider, (previous, next) {
+      if (!next.isLoading) notifyListeners();
+    });
   }
 }
 
@@ -97,10 +99,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       final status = authState.status;
       final location = state.matchedLocation;
 
-      debugPrint(
-        'DEBUG: Router Redirect Logic - Location: $location, AuthStatus: $status',
-      );
-
       // Screen categories
       final isSplash = location == AppRoutes.splash;
       final isRoleSelection = location == AppRoutes.roleSelection;
@@ -113,25 +111,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // 1. App is initializing
       if (status == AuthStatus.initial) {
-        debugPrint('DEBUG: Router - AuthStatus is initial, staying put');
         return null;
       }
 
       // 2. Not logged in
       if (status == AuthStatus.unauthenticated) {
-        debugPrint(
-          'DEBUG: Router - Unauthenticated. isSplash: $isSplash, isAuth: $isAuth',
-        );
         if (isSplash || isRoleSelection || isAuth) return null;
-        debugPrint('DEBUG: Router - Redirecting to Auth');
         return AppRoutes.auth;
       }
 
       // 3. Logged in
       if (status == AuthStatus.authenticated) {
-        debugPrint(
-          'DEBUG: Router - Authenticated. Onboarding: $isOnboardingCompleted, Personalization: $isPersonalizationCompleted',
-        );
 
         // Redirection logic for student journey
         if (isOnboardingCompleted == false) {
@@ -228,7 +218,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'details/:tenantId/:courseId',
                     name: 'courseDetails',
                     builder: (context, state) {
-                      debugPrint('===== ROUTER: building courseDetails route for ${state.matchedLocation} =====');
                       final tenantId = state.pathParameters['tenantId'] ?? '';
                       final courseId = state.pathParameters['courseId'] ?? '';
                       return CourseDetailScreen(
@@ -256,7 +245,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.library,
                 name: 'library',
                 builder: (context, state) =>
-                    const _PlaceholderPage(label: 'library'),
+                    const _LibraryPage(),
               ),
             ],
           ),
@@ -284,10 +273,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final tenantId = state.pathParameters['tenantId'] ?? '';
           final courseId = state.pathParameters['courseId'] ?? '';
           return CourseContextShell(
-            child: child,
             tenantId: tenantId,
             courseId: courseId,
             location: state.matchedLocation,
+            child: child,
           );
         },
         routes: [
@@ -389,12 +378,10 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 String? _checkCourseEnrollment(Ref ref, GoRouterState state) {
-  debugPrint('===== ROUTER REDIRECT: _checkCourseEnrollment STARTED for ${state.matchedLocation} =====');
   final tenantId = state.pathParameters['tenantId'];
   final courseId = state.pathParameters['courseId'];
 
   if (tenantId == null || courseId == null) {
-     debugPrint('===== ROUTER REDIRECT: tenantId or courseId is null =====');
      return null;
   }
 
@@ -402,27 +389,34 @@ String? _checkCourseEnrollment(Ref ref, GoRouterState state) {
 
   // If we are still loading, don't redirect yet to avoid kicking enrolled users out
   if (enrolledCoursesAsync.isLoading) {
-    debugPrint('===== ROUTER REDIRECT: enrolledCoursesAsync is loading. Returning null =====');
     return null;
   }
 
   final enrolledCourses = enrolledCoursesAsync.asData?.value ?? [];
   final isEnrolled = enrolledCourses.any((c) => c.id == courseId);
-  
-  debugPrint('===== ROUTER REDIRECT: isEnrolled=$isEnrolled =====');
 
   if (!isEnrolled) {
-    debugPrint('===== ROUTER REDIRECT: NOT enrolled. Redirecting to details screen =====');
     return '/app/discover-courses/details/$tenantId/$courseId';
   }
 
   // If they are on the base path and enrolled, send to overview
   if (state.matchedLocation == AppRoutes.courseBase) {
-    debugPrint('===== ROUTER REDIRECT: Enrolled and on base path. Redirecting to overview =====');
     return '/platform/$tenantId/course/$courseId/overview';
   }
 
   return null;
+}
+
+class _LibraryPage extends StatelessWidget {
+  const _LibraryPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Library')),
+      body: const Center(child: Text('Your enrolled courses will appear here.')),
+    );
+  }
 }
 
 class _PlaceholderPage extends StatelessWidget {

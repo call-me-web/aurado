@@ -1,5 +1,5 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:aurado/features/auth/data/repositories/supabase_auth_repository.dart';
@@ -32,17 +32,22 @@ final GetIt sl = GetIt.instance;
 ///
 /// Call this once in [main] before [runApp].
 Future<void> initDependencies() async {
+  // ── Validation ──────────────────────────────────────────
+  if (AppConstants.supabaseUrl.isEmpty || AppConstants.supabaseAnonKey.isEmpty) {
+    debugPrint('❌ ERROR: Missing Supabase credentials!');
+    debugPrint('Run with: flutter run --dart-define-from-file=.env');
+    debugPrint('Or use: make run');
+    // In debug mode, throw a clear error to prevent cryptic downstream crashes
+    if (kDebugMode) throw Exception('AppConstants.supabaseUrl is EMPTY. Injected values missing.');
+  }
+
   // ── Supabase ─────────────────────────────────────────────
-  debugPrint('DEBUG: Initializing Supabase...');
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
-  debugPrint('DEBUG: Supabase initialized.');
 
-  // Register Supabase client so any service can request it via sl<SupabaseClient>()
   sl.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
-  debugPrint('DEBUG: Supabase client registered.');
 
   // ── Core Utilities ────────────────────────────────────────
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
@@ -61,7 +66,6 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<BackupRepository>(
     () => SupabaseBackupRepository(sl<AppDatabase>(), sl<SupabaseClient>()),
   );
-  debugPrint('DEBUG: AppDatabase registered.');
 
   // --- Learning / Intelligence ---
   sl.registerLazySingleton<IntelligenceRepository>(
@@ -86,7 +90,6 @@ Future<void> initDependencies() async {
   );
 
   _registerAuth();
-  debugPrint('DEBUG: Auth registered.');
 }
 
 void _registerAuth() {

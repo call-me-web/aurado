@@ -9,6 +9,47 @@ part of 'exam_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(examRepository)
+final examRepositoryProvider = ExamRepositoryProvider._();
+
+final class ExamRepositoryProvider
+    extends $FunctionalProvider<ExamRepository, ExamRepository, ExamRepository>
+    with $Provider<ExamRepository> {
+  ExamRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'examRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$examRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<ExamRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ExamRepository create(Ref ref) {
+    return examRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ExamRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ExamRepository>(value),
+    );
+  }
+}
+
+String _$examRepositoryHash() => r'c8e79a56143633193cdfe801d776b41d2f496b84';
+
 @ProviderFor(exams)
 final examsProvider = ExamsFamily._();
 
@@ -64,7 +105,7 @@ final class ExamsProvider
   }
 }
 
-String _$examsHash() => r'17d6edb08e9b97923a29ce057e5cfe6b260a76ef';
+String _$examsHash() => r'd0a935dfe1c459ca7313309dbcbd1bf31de70b76';
 
 final class ExamsFamily extends $Family
     with
@@ -139,7 +180,7 @@ final class ExamProvider
   }
 }
 
-String _$examHash() => r'e74ae4bfc4ad2f6778f43c626010fd32d627630e';
+String _$examHash() => r'48fd30035ac6751a9139ed37db5881a3d9be1583';
 
 final class ExamFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<ExamModel>, String> {
@@ -183,7 +224,7 @@ final class ActiveExamSessionProvider
   ActiveExamSession create() => ActiveExamSession();
 }
 
-String _$activeExamSessionHash() => r'66aea48fc1c62b9c2f67342378f331b57a478f05';
+String _$activeExamSessionHash() => r'89b84f10f779130dfa4ad1cb79378d00da5c9181';
 
 abstract class _$ActiveExamSession extends $AsyncNotifier<ExamAttemptModel?> {
   FutureOr<ExamAttemptModel?> build();

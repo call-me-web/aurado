@@ -1,21 +1,28 @@
 import 'dart:async';
-import 'package:aurado/core/di/service_locator.dart';
+import 'package:aurado/core/di/provider_registry.dart';
 import 'package:aurado/features/exams/domain/models/exam_model.dart';
 import 'package:aurado/features/exams/domain/models/exam_attempt_model.dart';
 import 'package:aurado/features/exams/domain/models/question_response_model.dart';
 import 'package:aurado/features/exams/domain/repositories/exam_repository.dart';
+import 'package:aurado/features/exams/data/repositories/supabase_exam_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exam_provider.g.dart';
 
 @riverpod
+ExamRepository examRepository(Ref ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  return SupabaseExamRepository(supabase);
+}
+
+@riverpod
 Future<List<ExamModel>> exams(Ref ref, String targetType, String targetId) {
-  return sl<ExamRepository>().getExamsByTarget(targetType, targetId);
+  return ref.watch(examRepositoryProvider).getExamsByTarget(targetType, targetId);
 }
 
 @riverpod
 Future<ExamModel> exam(Ref ref, String examId) {
-  return sl<ExamRepository>().getExamById(examId);
+  return ref.watch(examRepositoryProvider).getExamById(examId);
 }
 
 @riverpod
@@ -24,6 +31,8 @@ class ActiveExamSession extends _$ActiveExamSession {
   final _stopwatch = Stopwatch();
   String? _currentQuestionId;
   int _currentQuestionTimeMs = 0;
+
+  ExamRepository get _repository => ref.read(examRepositoryProvider);
 
   @override
   FutureOr<ExamAttemptModel?> build() {
@@ -36,7 +45,7 @@ class ActiveExamSession extends _$ActiveExamSession {
   Future<void> startSession(String examId, String userId) async {
     state = const AsyncLoading();
     try {
-      final attempt = await sl<ExamRepository>().getOrStartExamAttempt(examId, userId);
+      final attempt = await _repository.getOrStartExamAttempt(examId, userId);
       state = AsyncData(attempt);
 
       _stopwatch.start();
@@ -66,7 +75,7 @@ class ActiveExamSession extends _$ActiveExamSession {
       answer: answerObject,
     );
 
-    await sl<ExamRepository>().upsertQuestionResponse(response);
+    await _repository.upsertQuestionResponse(response);
   }
 
   Future<void> attachCqImage(String questionId, String imageUrl) async {
@@ -79,14 +88,14 @@ class ActiveExamSession extends _$ActiveExamSession {
       uploadUrls: [imageUrl], 
     );
 
-    await sl<ExamRepository>().upsertQuestionResponse(response);
+    await _repository.upsertQuestionResponse(response);
   }
 
   void recordProctoringEvent(String eventType, {String? metadata}) {
     final attempt = state.value;
     if (attempt == null) return;
 
-    sl<ExamRepository>().syncProctoringLog(eventType, metadata, attempt.id);
+    _repository.syncProctoringLog(eventType, metadata, attempt.id);
   }
 
   Future<void> _syncHeartbeat() async {
@@ -99,7 +108,7 @@ class ActiveExamSession extends _$ActiveExamSession {
       _stopwatch.reset();
       _stopwatch.start();
 
-      await sl<ExamRepository>().syncEngagementHeartbeat(
+      await _repository.syncEngagementHeartbeat(
         attempt.id,
         _currentQuestionId!,
         _currentQuestionTimeMs,
@@ -115,7 +124,7 @@ class ActiveExamSession extends _$ActiveExamSession {
     _syncHeartbeat();
 
     final totalScore = 0; // Handled backend or future implementation
-    await sl<ExamRepository>().submitExamAttempt(attempt.id, totalScore);
+    await _repository.submitExamAttempt(attempt.id, totalScore);
     
     _heartbeatTimer?.cancel();
     _stopwatch.stop();

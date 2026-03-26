@@ -26,7 +26,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (mounted && GoRouterState.of(context).matchedLocation == AppRoutes.splash) {
         final authState = ref.read(authProvider);
         if (authState.status == AuthStatus.unauthenticated) {
-          debugPrint('DEBUG: SplashScreen - Fallback redirect to /auth');
           context.go(AppRoutes.auth);
         }
       }

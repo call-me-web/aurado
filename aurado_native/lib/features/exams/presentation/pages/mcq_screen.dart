@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:aurado/core/security/secure_screen.dart';
 import 'package:aurado/features/exams/domain/models/exam_model.dart';
 import 'package:aurado/features/exams/presentation/providers/exam_provider.dart';
+import 'package:aurado/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -54,7 +55,9 @@ class _McqScreenState extends ConsumerState<McqScreen>
     final exam = await ref.read(examProvider(widget.examId).future);
     _secondsRemaining = exam.durationMinutes * 60;
 
-    final userId = 'student_one'; // TODO: Get from auth provider
+    final authState = ref.read(authProvider);
+    final userId = authState.user?.id ?? 'guest';
+    
     await ref
         .read(activeExamSessionProvider.notifier)
         .startSession(widget.examId, userId);
@@ -171,8 +174,9 @@ class _McqScreenState extends ConsumerState<McqScreen>
   }
 
   Widget _buildExamBody(ExamModel exam, ThemeData theme) {
-    if (exam.questions.isEmpty)
+    if (exam.questions.isEmpty) {
       return const Center(child: Text('No questions found.'));
+    }
 
     final question = exam.questions[_currentQuestionIndex];
     final progress = (_currentQuestionIndex + 1) / exam.questions.length;

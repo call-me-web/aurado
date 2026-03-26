@@ -1,4 +1,3 @@
-import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
 import 'package:aurado/features/marketplace/providers/marketplace_provider.dart';
 import 'package:aurado/features/marketplace/presentation/widgets/marketplace_course_card.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +16,8 @@ class MyCoursesScreen extends ConsumerStatefulWidget {
 }
 
 class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
-  int? _expandedIndex;
-
   @override
   Widget build(BuildContext context) {
-    debugPrint('MyCoursesScreen: build called');
     final enrolledCoursesAsync = ref.watch(enrolledCoursesProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -64,15 +60,8 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
               itemCount: courses.length,
               separatorBuilder: (context, index) => const Gap(20),
               itemBuilder: (context, index) {
-                final isExpanded = _expandedIndex == index;
                 return MarketplaceCourseCard(
                   course: courses[index],
-                  isExpanded: isExpanded,
-                  onToggleExpanded: () {
-                    setState(() {
-                      _expandedIndex = isExpanded ? null : index;
-                    });
-                  },
                 );
               },
             );
@@ -142,7 +131,6 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
             ),
           ),
           const Gap(32),
-          // Link to Discover Courses would be nice, but we are inside the Shell
         ],
       ),
     );

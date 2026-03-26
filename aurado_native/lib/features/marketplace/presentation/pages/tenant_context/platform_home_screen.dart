@@ -60,7 +60,9 @@ class PlatformHomeScreen extends ConsumerWidget {
                       size: 20,
                     ),
                     onPressed: () {
-                      // TODO: Implement share
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Share feature coming soon!')),
+                      );
                     },
                   ),
                 ),
@@ -132,7 +134,7 @@ class PlatformHomeScreen extends ConsumerWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.3),
+                      Colors.black.withValues(alpha: 0.3),
                       Colors.transparent,
                       colorScheme.surface,
                     ],
@@ -164,7 +166,7 @@ class PlatformHomeScreen extends ConsumerWidget {
                     border: Border.all(color: colorScheme.surface, width: 4),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

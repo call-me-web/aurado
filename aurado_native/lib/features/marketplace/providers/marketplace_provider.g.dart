@@ -9,6 +9,54 @@ part of 'marketplace_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(marketplaceRepository)
+final marketplaceRepositoryProvider = MarketplaceRepositoryProvider._();
+
+final class MarketplaceRepositoryProvider
+    extends
+        $FunctionalProvider<
+          MarketplaceRepository,
+          MarketplaceRepository,
+          MarketplaceRepository
+        >
+    with $Provider<MarketplaceRepository> {
+  MarketplaceRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'marketplaceRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$marketplaceRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<MarketplaceRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  MarketplaceRepository create(Ref ref) {
+    return marketplaceRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MarketplaceRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MarketplaceRepository>(value),
+    );
+  }
+}
+
+String _$marketplaceRepositoryHash() =>
+    r'1831fe0f092d27cfcfe2b3130e61b4d83c61c084';
+
 @ProviderFor(MarketplaceTenants)
 final marketplaceTenantsProvider = MarketplaceTenantsProvider._();
 
@@ -34,7 +82,7 @@ final class MarketplaceTenantsProvider
 }
 
 String _$marketplaceTenantsHash() =>
-    r'3b60aa7b81e06077727e10fc9874808ec9b4cf84';
+    r'3accbc6ccec2ca3f54930073a0d1adb16fc2c761';
 
 abstract class _$MarketplaceTenants extends $AsyncNotifier<List<TenantModel>> {
   FutureOr<List<TenantModel>> build();
@@ -110,7 +158,7 @@ final class TenantProvider
   }
 }
 
-String _$tenantHash() => r'4bcace895fecf1df56e7482b5370c1915c56a51d';
+String _$tenantHash() => r'd2b0d14236c2ccd86c877e8395b584eefd4f0c9b';
 
 final class TenantFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<TenantModel?>, String> {
@@ -171,7 +219,7 @@ final class DiscoveryCoursesProvider
   }
 }
 
-String _$discoveryCoursesHash() => r'5d349976a3f50890000224e9040b7ea4811528c5';
+String _$discoveryCoursesHash() => r'f585bf7c7924a9c03c9cc931c8ba827fa34633f7';
 
 final class DiscoveryCoursesFamily extends $Family
     with
@@ -253,7 +301,7 @@ final class EnrolledCoursesProvider
   EnrolledCourses create() => EnrolledCourses();
 }
 
-String _$enrolledCoursesHash() => r'ff7cb5b91442d263956674703be0f0d7274f1299';
+String _$enrolledCoursesHash() => r'8b939936d60f7c09ba22c807240c02996c112135';
 
 abstract class _$EnrolledCourses
     extends $AsyncNotifier<List<DiscoveryCourseModel>> {
@@ -324,7 +372,7 @@ final class PopularCategoriesProvider
   }
 }
 
-String _$popularCategoriesHash() => r'49b984beb9a3a848b54e67c94d6c17b5df2cb0b7';
+String _$popularCategoriesHash() => r'25d771eadf712cab626a4fc283bdcc3dfdf19d5f';
 
 @ProviderFor(EnrollmentController)
 final enrollmentControllerProvider = EnrollmentControllerProvider._();
@@ -359,7 +407,7 @@ final class EnrollmentControllerProvider
 }
 
 String _$enrollmentControllerHash() =>
-    r'9957a7364ad594359853d026972433fdbede8597';
+    r'8deac39e03dfdc95b89485c4f77d2188e34895fb';
 
 abstract class _$EnrollmentController extends $Notifier<AsyncValue<String?>> {
   AsyncValue<String?> build();

@@ -1,8 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 
 /// Performance-optimized Dio client.
-/// Uses interceptors for logging and error handling.
+///
+/// Interceptors:
+/// - [InternalInterceptor]: always active — handles global request/response hooks.
+/// - [LogInterceptor]: **debug builds only** — never logs in release to prevent
+///   Authorization headers and response bodies from appearing in logcat/console.
 class DioClient {
   DioClient() {
     _dio = Dio(
@@ -14,15 +19,20 @@ class DioClient {
       ),
     );
 
-    _dio.interceptors.addAll([
-      InternalInterceptor(),
-      LogInterceptor(
-        requestHeader: true,
-        responseHeader: false,
-        requestBody: true,
-        responseBody: true,
-      ),
-    ]);
+    _dio.interceptors.add(InternalInterceptor());
+
+    // SECURITY: Only log in debug mode. Release builds must never expose
+    // Authorization headers or response payloads to the system log.
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        LogInterceptor(
+          requestHeader: true,
+          responseHeader: false,
+          requestBody: true,
+          responseBody: true,
+        ),
+      );
+    }
   }
 
   late final Dio _dio;
@@ -34,7 +44,8 @@ class DioClient {
 class InternalInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // TODO: Add global headers (e.g., User-Agent, Tenant-ID if applicable)
+    options.headers['User-Agent'] = 'Aurado-Native/1.0.0';
+    // Add other persistent headers here
     super.onRequest(options, handler);
   }
 

@@ -29,8 +29,7 @@ class CourseContextShell extends StatefulWidget {
   State<CourseContextShell> createState() => _CourseContextShellState();
 }
 
-class _CourseContextShellState extends State<CourseContextShell>
-    with SingleTickerProviderStateMixin {
+class _CourseContextShellState extends State<CourseContextShell> {
   int _revealCounter = 0;
 
   @override
@@ -47,10 +46,6 @@ class _CourseContextShellState extends State<CourseContextShell>
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   int _calculateSelectedIndex(String location) {
     if (location.contains('/overview')) return 0;
@@ -176,9 +171,10 @@ class _HomeButtonState extends State<_HomeButton> {
   }
 
   void _triggerReveal() {
+    if (!mounted) return;
     setState(() => _showText = true);
     _revealTimer?.cancel();
-    _revealTimer = Timer(const Duration(seconds: 2), () {
+    _revealTimer = Timer(const Duration(seconds: 3), () {
       if (mounted && !_isHovered) {
         setState(() => _showText = false);
       }
@@ -191,19 +187,17 @@ class _HomeButtonState extends State<_HomeButton> {
     final colorScheme = theme.colorScheme;
     final navTheme = theme.extension<NavBarTheme>();
     final activeColor = navTheme?.activeColor ?? Colors.blue;
-    final inactiveColor = navTheme?.unselectedColor ?? colorScheme.onSurface.withValues(alpha: 0.6);
+    final inactiveColor = navTheme?.unselectedColor ??
+        colorScheme.onSurface.withValues(alpha: 0.6);
     final showExpanded = _isHovered || _showText;
 
     return MouseRegion(
       onEnter: (_) {
         setState(() => _isHovered = true);
+        _triggerReveal();
       },
       onExit: (_) {
         setState(() => _isHovered = false);
-        // If we were showing text via trigger, start/restart the timer when leaving hover
-        if (_showText) {
-          _triggerReveal();
-        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),

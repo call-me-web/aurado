@@ -88,7 +88,7 @@ class HomeScreen extends ConsumerWidget {
                 child: Icon(
                   Icons.auto_awesome,
                   size: 150,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
               if (authState.canRestore)
@@ -145,9 +145,9 @@ class HomeScreen extends ConsumerWidget {
         ), // Adjusted margin for SafeArea
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.purple.withOpacity(0.1),
+          color: Colors.purple.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(7.0),
-          border: Border.all(color: Colors.purple.withOpacity(0.3)),
+          border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [

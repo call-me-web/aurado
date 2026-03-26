@@ -5,8 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pod_player/pod_player.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:aurado/core/di/service_locator.dart';
-import 'package:aurado/core/network/signed_url_resolver.dart';
+import 'package:aurado/core/di/provider_registry.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:aurado/features/learning/presentation/pages/pdf_viewer_screen.dart';
@@ -37,6 +36,42 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
       DraggableScrollableController();
 
   @override
+  void initState() {
+    super.initState();
+    // Defer initialization to after the first frame so we have the initial lesson data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndInitialize();
+    });
+  }
+
+  @override
+  void didUpdateWidget(LessonPlayerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.lessonId != widget.lessonId) {
+      _checkAndInitialize();
+    }
+  }
+
+  void _checkAndInitialize() {
+    final curriculumAsync = ref.read(curriculumProvider(widget.courseId));
+    curriculumAsync.whenData((subjects) {
+      final allLessons = subjects
+          .expand((s) => s.chapters)
+          .expand((c) => c.lessons)
+          .toList();
+
+      final lessonIndex = allLessons.indexWhere((l) => l.id == widget.lessonId);
+      if (lessonIndex != -1) {
+        final lesson = allLessons[lessonIndex];
+        if (lesson.lessonType.toLowerCase() == 'video' &&
+            lesson.contentUrl != null) {
+          _initializePlayer(lesson.contentUrl!, lesson.title);
+        }
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
@@ -54,7 +89,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
     });
 
     try {
-      final resolvedUrl = await sl<SignedUrlResolver>().resolve(
+      final resolvedUrl = await ref.read(signedUrlResolverProvider).resolve(
         rawUrl,
         courseId: widget.courseId,
         tenantId: widget.tenantId,
@@ -424,12 +459,14 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                         const Divider(height: 1),
                         // 2. PDF Content
                         Expanded(
-                          child: SfPdfViewer.network(
-                            _currentPdfUrl!,
-                            key: ValueKey(_currentPdfUrl),
-                            canShowScrollHead: true,
-                            canShowScrollStatus: true,
-                          ),
+                          child: size > 0.05
+                              ? SfPdfViewer.network(
+                                  _currentPdfUrl!,
+                                  key: ValueKey(_currentPdfUrl),
+                                  canShowScrollHead: true,
+                                  canShowScrollStatus: true,
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     ),
@@ -445,9 +482,6 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
 
   Widget _buildPlayer(String url, String title) {
     final theme = Theme.of(context);
-    // Initialise asynchronously - don't worry about multi-calls,
-    // _initializePlayer has guards.
-    _initializePlayer(url, title);
 
     if (_errorMessage != null) {
       return AspectRatio(
@@ -612,7 +646,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
           onTap: () async {
             setState(() => _isResolving = true);
             try {
-              final signedUrl = await sl<SignedUrlResolver>().resolve(
+              final signedUrl = await ref.read(signedUrlResolverProvider).resolve(
                 url,
                 courseId: widget.courseId,
                 tenantId: widget.tenantId,

@@ -1,4 +1,3 @@
-import 'package:aurado/features/learning/domain/models/lesson_model.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:hugeicons/hugeicons.dart';

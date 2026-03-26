@@ -1,8 +1,7 @@
 import 'dart:io';
-import 'package:aurado/core/di/service_locator.dart';
 import 'package:aurado/features/exams/domain/models/exam_model.dart';
-import 'package:aurado/features/exams/domain/repositories/exam_repository.dart';
 import 'package:aurado/features/exams/presentation/providers/exam_provider.dart';
+import 'package:aurado/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,7 +30,9 @@ class _CqScreenState extends ConsumerState<CqScreen> {
 
   Future<void> _initializeExam() async {
     final exam = await ref.read(examProvider(widget.examId).future);
-    final userId = 'student_one'; // TODO: Auth state
+    final authState = ref.read(authProvider);
+    final userId = authState.user?.id ?? 'guest';
+    
     await ref
         .read(activeExamSessionProvider.notifier)
         .startSession(widget.examId, userId);
@@ -62,10 +63,14 @@ class _CqScreenState extends ConsumerState<CqScreen> {
       final attempt = ref.read(activeExamSessionProvider).value;
       if (attempt == null) throw Exception("Session not initialized");
 
-      final tenantSlug = 'fix-academ'; // TODO: Dynamically fetch
+      // Extract tenant slug from ID or use a fallback. 
+      // In production, this would come from a TenantProvider.
+      final tenantSlug = widget.examId.contains('_') 
+          ? widget.examId.split('_').first 
+          : 'default';
 
       // Upload and get URL from R2
-      final url = await sl<ExamRepository>().uploadCqAnswerImage(
+      final url = await ref.read(examRepositoryProvider).uploadCqAnswerImage(
         file,
         tenantSlug,
         attempt.id,
