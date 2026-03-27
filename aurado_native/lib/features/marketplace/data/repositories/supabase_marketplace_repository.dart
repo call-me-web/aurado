@@ -74,22 +74,35 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
         .select('*, branding(*)')
         .limit(10);
     
-    return (response as List).map((json) {
-      final map = Map<String, dynamic>.from(json);
-      final branding = map['branding'] as Map<String, dynamic>?;
-      
-      map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
-      map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
-      
-      // Map branding fields to TenantModel
-      if (branding != null) {
-        map['color_background'] = branding['color_background'];
-        map['color_button'] = branding['color_button'];
-        map['color_card'] = branding['color_card'];
-      }
-      
-      return TenantModel.fromJson(map);
-    }).toList();
+    return (response as List).map((json) => _mapTenant(json)).toList();
+  }
+
+  @override
+  Future<List<TenantModel>> searchTenants(String query) async {
+    final response = await _supabase
+        .from('tenants')
+        .select('*, branding(*)')
+        .or('name.ilike.%$query%,slug.ilike.%$query%')
+        .limit(5); // Limit institution results in search
+    
+    return (response as List).map((json) => _mapTenant(json)).toList();
+  }
+
+  TenantModel _mapTenant(dynamic json) {
+    final map = Map<String, dynamic>.from(json);
+    final branding = map['branding'] as Map<String, dynamic>?;
+    
+    map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
+    map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
+    
+    // Map branding fields to TenantModel
+    if (branding != null) {
+      map['color_background'] = branding['color_background'];
+      map['color_button'] = branding['color_button'];
+      map['color_card'] = branding['color_card'];
+    }
+    
+    return TenantModel.fromJson(map);
   }
 
   @override
@@ -102,24 +115,15 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
 
     if (response == null) return null;
 
-    final map = Map<String, dynamic>.from(response);
-    final branding = map['branding'] as Map<String, dynamic>?;
-
-    map['logo_url'] = _normalizeR2Url(map['logo_url'] as String?);
-    map['cover_url'] = _normalizeR2Url(map['cover_url'] as String?);
-
-    // Map branding fields to TenantModel
-    if (branding != null) {
-      map['color_background'] = branding['color_background'];
-      map['color_button'] = branding['color_button'];
-      map['color_card'] = branding['color_card'];
-    }
-
-    return TenantModel.fromJson(map);
+    return _mapTenant(response);
   }
 
   @override
-  Future<List<DiscoveryCourseModel>> getDiscoveryCourses({String? tenantId, String? search}) async {
+  Future<List<DiscoveryCourseModel>> getDiscoveryCourses({
+    String? tenantId,
+    String? search,
+    String? category,
+  }) async {
     var query = _supabase.from('courses').select('''
       *,
       tenants (
@@ -130,6 +134,11 @@ class SupabaseMarketplaceRepository implements MarketplaceRepository {
 
     if (tenantId != null) {
       query = query.eq('tenant_id', tenantId);
+    }
+
+    if (category != null && category.isNotEmpty && category != 'All') {
+      // Using cs (contains) for array column course_category
+      query = query.contains('course_category', [category]);
     }
 
     if (search != null && search.isNotEmpty) {

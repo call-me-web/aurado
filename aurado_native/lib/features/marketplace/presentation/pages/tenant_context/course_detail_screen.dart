@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -7,6 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:aurado/features/marketplace/domain/models/discovery_course_model.dart';
 import 'package:aurado/features/marketplace/providers/marketplace_provider.dart';
 import 'package:aurado/core/theme/theme_config.dart';
+import 'package:aurado/core/performance/performance_provider.dart';
+import 'package:aurado/core/presentation/components/aurado_button_cta.dart';
 
 
 /// Course detail screen for non-enrolled users.
@@ -104,7 +107,7 @@ class CourseDetailScreen extends ConsumerWidget {
   }
 }
 
-class _CourseDetailView extends StatefulWidget {
+class _CourseDetailView extends ConsumerStatefulWidget {
   final DiscoveryCourseModel course;
   final bool isLoading;
   final bool isEnrolled;
@@ -120,10 +123,10 @@ class _CourseDetailView extends StatefulWidget {
   });
 
   @override
-  State<_CourseDetailView> createState() => _CourseDetailViewState();
+  ConsumerState<_CourseDetailView> createState() => _CourseDetailViewState();
 }
 
-class _CourseDetailViewState extends State<_CourseDetailView> {
+class _CourseDetailViewState extends ConsumerState<_CourseDetailView> {
   int _selectedTab = 0;
 
   @override
@@ -134,68 +137,233 @@ class _CourseDetailViewState extends State<_CourseDetailView> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          _CourseHero(course: widget.course),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    ThemeConfig.spacingLg,
-                    ThemeConfig.spacingLg,
-                    ThemeConfig.spacingLg,
-                    0,
-                  ),
-
-                  child: Text(
-                    widget.course.title.trim(),
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w900, // Even bolder for premium look
-                      fontSize: 24,
-                      color: colorScheme.onSurface,
-                      height: 1.1,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-
-                const Gap(ThemeConfig.spacingSm),
-                if (widget.course.courseCategory.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "This course for ${widget.course.courseCategory.join(', ')}",
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+          // ── Main Content Scrolling Area ────────────────────────────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _CourseHero(course: widget.course),
+                    
+                    // Title section with premium badge
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'PREMIUM COURSE',
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
+                          const Gap(12),
+                          Text(
+                            widget.course.title.trim(),
+                            style: textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 28,
+                              color: colorScheme.onSurface,
+                              height: 1.1,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                const Gap(ThemeConfig.spacingMd),
-                const Divider(),
 
-                _AcademyRow(
-                  course: widget.course,
-                  isLoading: widget.isLoading,
-                  isEnrolled: widget.isEnrolled,
-                  tenantId: widget.tenantId,
-                  courseId: widget.courseId,
+                    const Gap(ThemeConfig.spacingSm),
+                    if (widget.course.courseCategory.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "This course for ${widget.course.courseCategory.join(', ')}",
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    const Gap(ThemeConfig.spacingMd),
+                    const Divider(),
+
+                    _AcademyRow(
+                      course: widget.course,
+                      isLoading: widget.isLoading,
+                      isEnrolled: widget.isEnrolled,
+                      tenantId: widget.tenantId,
+                      courseId: widget.courseId,
+                    ),
+                    const Divider(),
+                    const Gap(8),
+                    _DetailTabs(
+                      selectedIndex: _selectedTab,
+                      onSelected: (index) => setState(() => _selectedTab = index),
+                    ),
+                    const Gap(24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildTabContent(_selectedTab, colorScheme, textTheme),
+                    ),
+                    const Gap(120), // More space for bottom bar
+                  ],
                 ),
-                const Divider(),
-                const Gap(8),
-                _DetailTabs(
-                  selectedIndex: _selectedTab,
-                  onSelected: (index) => setState(() => _selectedTab = index),
+              ),
+            ],
+          ),
+
+          // ── Pinned Back Button ─────────────────────────────────────────────
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 12,
+            child: Material(
+              color: Colors.black.withValues(alpha: 0.3),
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: () => Navigator.of(context).pop(),
+                customBorder: const CircleBorder(),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
                 ),
-                const Gap(24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildTabContent(_selectedTab, colorScheme, textTheme),
+              ),
+            ),
+          ),
+
+          // ── Glassmorphic Floating Action Bar ────────────────────────────────
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: MediaQuery.of(context).padding.bottom + 16,
+            child: _buildFloatingActionBar(context, colorScheme, textTheme),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionBar(BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
+    final performance = ref.watch(performanceProvider);
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 72,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          // 1. Background layer (Glass or Solid)
+          Positioned.fill(
+            child: performance.enableGlassmorphism
+                ? BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface.withAlpha((0.85 * 255).toInt()),
+                        border: Border.all(
+                          color: colorScheme.onSurface.withValues(alpha: 0.1),
+                          width: 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      border: Border.all(
+                        color: colorScheme.onSurface.withValues(alpha: 0.1),
+                        width: 0.5,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+          ),
+          
+          // 2. Foreground Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                // Price Info
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'COURSE PRICE',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 9,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        widget.course.price <= 0 ? 'Free' : '৳${widget.course.price.toStringAsFixed(0)}',
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: colorScheme.primary,
+                          height: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Gap(80),
+                
+                // Add to Cart Icon Button
+                IconButton(
+                  icon: Icon(Icons.shopping_cart_outlined, color: colorScheme.onSurface, size: 22),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    // TODO: Implement cart functionality
+                  },
+                ),
+                const Gap(16),
+                
+                // Enroll Now Button - adaptive width with constraints
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 120, maxWidth: 140),
+                  child: AuradoButton_cta(
+                    text: widget.isEnrolled ? 'Continue' : 'Enroll Now',
+                    onPressed: () {
+                      if (widget.isEnrolled) {
+                        context.push('/platform/${widget.tenantId}/course/${widget.courseId}/overview');
+                      } else {
+                        ref.read(enrollmentControllerProvider.notifier).handleEnrollment(widget.course);
+                      }
+                    },
+                    isLoading: widget.isLoading,
+                    color: colorScheme.primary,
+                    textColor: Colors.white,
+                    borderRadius: 14,
+                    size: AuradoButtonSize.medium,
+                  ),
+                ),
               ],
             ),
           ),
@@ -323,23 +491,6 @@ class _CourseHero extends StatelessWidget {
             ),
           ),
         ),
-        // Back Button
-        Positioned(
-          top: topPadding + ThemeConfig.spacingSm,
-          left: ThemeConfig.spacingSm + 4,
-          child: Material(
-            color: Colors.black.withValues(alpha: 0.3),
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: () => context.pop(),
-              customBorder: const CircleBorder(),
-              child: const Padding(
-                padding: EdgeInsets.all(ThemeConfig.spacingSm),
-                child: Icon(Icons.arrow_back, color: Colors.white, size: 24),
-              ),
-            ),
-          ),
-        ),
 
         // Status Badge (e.g., "Recorded")
         Positioned(
@@ -448,14 +599,6 @@ class _AcademyRow extends ConsumerWidget {
               ),
             ),
             const Gap(12),
-            // Enroll Button
-            _EnrollButton(
-              course: course,
-              isLoading: isLoading,
-              isEnrolled: isEnrolled,
-              tenantId: tenantId,
-              courseId: courseId,
-            ),
           ],
         ),
       ),
@@ -464,64 +607,6 @@ class _AcademyRow extends ConsumerWidget {
   }
 }
 
-class _EnrollButton extends ConsumerWidget {
-  final DiscoveryCourseModel course;
-  final bool isLoading;
-  final bool isEnrolled;
-  final String tenantId;
-  final String courseId;
-
-  const _EnrollButton({
-    required this.course,
-    required this.isLoading,
-    required this.isEnrolled,
-    required this.tenantId,
-    required this.courseId,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return ElevatedButton(
-      onPressed: isLoading
-          ? null
-          : () {
-              if (isEnrolled) {
-                context.push('/platform/$tenantId/course/$courseId/overview');
-              } else {
-                ref.read(enrollmentControllerProvider.notifier).handleEnrollment(course);
-              }
-            },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(0, 44),
-        padding: const EdgeInsets.symmetric(horizontal: ThemeConfig.spacingLg),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ThemeConfig.radiusMd),
-        ),
-        elevation: 2,
-        shadowColor: colorScheme.primary.withValues(alpha: 0.3),
-      ),
-      child: isLoading
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-            )
-          : Text(
-              isEnrolled ? 'Continue' : 'Enroll now',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                letterSpacing: 0.2,
-              ),
-            ),
-    );
-  }
-
-}
 
 class _DetailTabs extends StatelessWidget {
   final int selectedIndex;

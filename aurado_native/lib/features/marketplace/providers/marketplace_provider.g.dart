@@ -103,6 +103,83 @@ abstract class _$MarketplaceTenants extends $AsyncNotifier<List<TenantModel>> {
   }
 }
 
+@ProviderFor(searchTenants)
+final searchTenantsProvider = SearchTenantsFamily._();
+
+final class SearchTenantsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<TenantModel>>,
+          List<TenantModel>,
+          FutureOr<List<TenantModel>>
+        >
+    with
+        $FutureModifier<List<TenantModel>>,
+        $FutureProvider<List<TenantModel>> {
+  SearchTenantsProvider._({
+    required SearchTenantsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'searchTenantsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$searchTenantsHash();
+
+  @override
+  String toString() {
+    return r'searchTenantsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<TenantModel>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<TenantModel>> create(Ref ref) {
+    final argument = this.argument as String;
+    return searchTenants(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SearchTenantsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$searchTenantsHash() => r'21b266796a5d916813e549652601c13791d30db4';
+
+final class SearchTenantsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<TenantModel>>, String> {
+  SearchTenantsFamily._()
+    : super(
+        retry: null,
+        name: r'searchTenantsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  SearchTenantsProvider call(String query) =>
+      SearchTenantsProvider._(argument: query, from: this);
+
+  @override
+  String toString() => r'searchTenantsProvider';
+}
+
 @ProviderFor(tenant)
 final tenantProvider = TenantFamily._();
 
@@ -185,7 +262,7 @@ final class DiscoveryCoursesProvider
         $AsyncNotifierProvider<DiscoveryCourses, List<DiscoveryCourseModel>> {
   DiscoveryCoursesProvider._({
     required DiscoveryCoursesFamily super.from,
-    required String? super.argument,
+    required ({String? tenantId, String? category}) super.argument,
   }) : super(
          retry: null,
          name: r'discoveryCoursesProvider',
@@ -201,7 +278,7 @@ final class DiscoveryCoursesProvider
   String toString() {
     return r'discoveryCoursesProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -219,7 +296,7 @@ final class DiscoveryCoursesProvider
   }
 }
 
-String _$discoveryCoursesHash() => r'f585bf7c7924a9c03c9cc931c8ba827fa34633f7';
+String _$discoveryCoursesHash() => r'2639e16298113e02215e028309e8844e40298d86';
 
 final class DiscoveryCoursesFamily extends $Family
     with
@@ -228,7 +305,7 @@ final class DiscoveryCoursesFamily extends $Family
           AsyncValue<List<DiscoveryCourseModel>>,
           List<DiscoveryCourseModel>,
           FutureOr<List<DiscoveryCourseModel>>,
-          String?
+          ({String? tenantId, String? category})
         > {
   DiscoveryCoursesFamily._()
     : super(
@@ -239,8 +316,11 @@ final class DiscoveryCoursesFamily extends $Family
         isAutoDispose: true,
       );
 
-  DiscoveryCoursesProvider call({String? tenantId}) =>
-      DiscoveryCoursesProvider._(argument: tenantId, from: this);
+  DiscoveryCoursesProvider call({String? tenantId, String? category}) =>
+      DiscoveryCoursesProvider._(
+        argument: (tenantId: tenantId, category: category),
+        from: this,
+      );
 
   @override
   String toString() => r'discoveryCoursesProvider';
@@ -248,10 +328,14 @@ final class DiscoveryCoursesFamily extends $Family
 
 abstract class _$DiscoveryCourses
     extends $AsyncNotifier<List<DiscoveryCourseModel>> {
-  late final _$args = ref.$arg as String?;
-  String? get tenantId => _$args;
+  late final _$args = ref.$arg as ({String? tenantId, String? category});
+  String? get tenantId => _$args.tenantId;
+  String? get category => _$args.category;
 
-  FutureOr<List<DiscoveryCourseModel>> build({String? tenantId});
+  FutureOr<List<DiscoveryCourseModel>> build({
+    String? tenantId,
+    String? category,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
@@ -272,9 +356,53 @@ abstract class _$DiscoveryCourses
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(tenantId: _$args));
+    element.handleCreate(
+      ref,
+      () => build(tenantId: _$args.tenantId, category: _$args.category),
+    );
   }
 }
+
+@ProviderFor(featuredCourses)
+final featuredCoursesProvider = FeaturedCoursesProvider._();
+
+final class FeaturedCoursesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<DiscoveryCourseModel>>,
+          List<DiscoveryCourseModel>,
+          FutureOr<List<DiscoveryCourseModel>>
+        >
+    with
+        $FutureModifier<List<DiscoveryCourseModel>>,
+        $FutureProvider<List<DiscoveryCourseModel>> {
+  FeaturedCoursesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'featuredCoursesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$featuredCoursesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<DiscoveryCourseModel>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<DiscoveryCourseModel>> create(Ref ref) {
+    return featuredCourses(ref);
+  }
+}
+
+String _$featuredCoursesHash() => r'565f718ba516a7870d36f608ecccdb75d8aa1c1a';
 
 @ProviderFor(EnrolledCourses)
 final enrolledCoursesProvider = EnrolledCoursesProvider._();
@@ -372,7 +500,7 @@ final class PopularCategoriesProvider
   }
 }
 
-String _$popularCategoriesHash() => r'25d771eadf712cab626a4fc283bdcc3dfdf19d5f';
+String _$popularCategoriesHash() => r'1933891d23fa5231b74e2fed6ff6a033d40cff1c';
 
 @ProviderFor(EnrollmentController)
 final enrollmentControllerProvider = EnrollmentControllerProvider._();

@@ -71,4 +71,91 @@ class ThemeConfig {
   /// Global stroke/border widths.
   static const double strokeWidthThin = 1.5;
   static const double strokeWidthThick = 2.0;
+
+  // ── 8. Font Sizes ──────────────────────────────────────────────────────────
+  /// Use these instead of hardcoding `fontSize` anywhere in widget files.
+  static const double fontSizeXs = 10.0;   // Institution label, fine print
+  static const double fontSizeSm = 12.0;   // Chips, tags, badge text
+  static const double fontSizeMd = 14.0;   // Body, form labels, hints
+  static const double fontSizeLg = 16.0;   // Section body, button labels
+  static const double fontSizeXl = 18.0;   // Titles, card headings
+  static const double fontSizeXxl = 22.0;  // Screen display headings
+  static const double fontSizeDisplay = 28.0; // Hero / splash display
+
+  // ── 9. Font Weights ────────────────────────────────────────────────────────
+  /// Semantic weight aliases. Prefer these over raw `FontWeight.w___` values.
+  static const FontWeight weightRegular  = FontWeight.w400; // Body copy
+  static const FontWeight weightMedium   = FontWeight.w500; // Subtle emphasis
+  static const FontWeight weightSemiBold = FontWeight.w600; // Labels, titles
+  static const FontWeight weightBold     = FontWeight.w700; // Headings
+  static const FontWeight weightExtraBold = FontWeight.w800; // Section headers
+  static const FontWeight weightBlack    = FontWeight.w900; // Hero text
+
+  // ── 10. Semantic Text Colors ───────────────────────────────────────────────
+  /// Semantic helpers that auto-adapt to light / dark mode via [Brightness].
+  ///
+  /// Usage: `ThemeConfig.textPrimary(isDark)`
+  /// or wrap with `Theme.of(context).colorScheme` checks in widgets.
+
+  /// Main body / heading text — high contrast.
+  static Color textPrimary(bool isDark) =>
+      isDark ? onDarkBackground : onLightBackground;
+
+  /// Secondary text — body copy on surface.
+  static Color textSecondary(bool isDark) =>
+      isDark ? onDarkSurface : onLightSurface;
+
+  /// Muted / hint / caption text — low emphasis.
+  static Color textMuted(bool isDark) =>
+      isDark ? darkMuted : lightMuted;
+
+  /// Price highlight — always uses the brand primary color.
+  static const Color textPrice = primary;
+
+  /// Category accent — always uses the brand secondary color.
+  static const Color textCategoryAccent = secondary;
+
+  /// Destructive / error text.
+  static const Color textError = error;
+
+  // ── 11. Role-Based Text Style Specs ───────────────────────────────────────
+  // These are named roles used in widgets via `textTheme.*?.copyWith(...)`.
+  // Do NOT duplicate TextStyle objects here; instead define size+weight pairs
+  // that widgets can pick up from TextTheme and override selectively.
+
+  /// Section header (e.g. "Featured Courses", "Top Institutions").
+  static const double sectionHeaderSize   = fontSizeLg;
+  static const FontWeight sectionHeaderWeight = weightExtraBold;
+  static const double sectionHeaderLetterSpacing = -0.5;
+
+  /// Card title (primary text on course/institution cards).
+  static const double cardTitleSize   = fontSizeMd;
+  static const FontWeight cardTitleWeight = weightBold;
+
+  /// Card subtitle / metadata (e.g. duration, level).
+  static const double cardMetaSize   = fontSizeSm;
+  static const FontWeight cardMetaWeight = weightMedium;
+
+  /// Price label on cards.
+  static const double cardPriceSize   = fontSizeSm;
+  static const FontWeight cardPriceWeight = weightExtraBold;
+
+  /// "See All" / action link text.
+  static const double actionLinkSize   = fontSizeSm;
+  static const FontWeight actionLinkWeight = weightBold;
+
+  /// Chip / category filter label.
+  static const double chipLabelSize   = fontSizeSm;
+  static const FontWeight chipLabelWeight = weightSemiBold;
+
+  /// Institution label under circle avatar.
+  static const double institutionLabelSize   = fontSizeXs;
+  static const FontWeight institutionLabelWeight = weightSemiBold;
+
+  /// Descriptive/body text (e.g. "This course is perfect for...").
+  static const double descriptionBodySize   = fontSizeMd;
+  static const FontWeight descriptionBodyWeight = weightRegular;
+
+  /// Bold inline highlight within description (e.g. category value).
+  static const FontWeight descriptionAccentWeight = weightBold;
 }

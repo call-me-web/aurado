@@ -213,20 +213,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.discoverCourses,
                 name: 'discoverCourses',
                 builder: (context, state) => const DiscoverCoursesScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'details/:tenantId/:courseId',
-                    name: 'courseDetails',
-                    builder: (context, state) {
-                      final tenantId = state.pathParameters['tenantId'] ?? '';
-                      final courseId = state.pathParameters['courseId'] ?? '';
-                      return CourseDetailScreen(
-                        tenantId: tenantId,
-                        courseId: courseId,
-                      );
-                    },
-                  ),
-                ],
               ),
             ],
           ),
@@ -371,6 +357,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final examId = state.pathParameters['examId'] ?? '';
           return CqScreen(examId: examId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.courseDetails,
+        name: 'courseDetails',
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId'] ?? '';
+          final courseId = state.pathParameters['courseId'] ?? '';
+          return CourseDetailScreen(
+            tenantId: tenantId,
+            courseId: courseId,
+          );
         },
       ),
     ],

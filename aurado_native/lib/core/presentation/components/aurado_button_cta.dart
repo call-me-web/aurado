@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:aurado/core/theme/theme_config.dart';
@@ -121,6 +122,7 @@ class AuradoButton_cta extends StatelessWidget {
       width: width,
       height: height,
       child: _buildButton(
+        context: context,
         onPressed: isLoading ? null : onPressed,
         radius: radius,
         effectiveColor: effectiveColor,
@@ -132,6 +134,7 @@ class AuradoButton_cta extends StatelessWidget {
   }
 
   Widget _buildButton({
+    required BuildContext context,
     required VoidCallback? onPressed,
     required double radius,
     required Color effectiveColor,
@@ -141,18 +144,61 @@ class AuradoButton_cta extends StatelessWidget {
   }) {
     switch (variant) {
       case AuradoButtonVariant.filled:
-        return ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: effectiveColor,
-            foregroundColor: effectiveTextColor,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(radius),
-            ),
-            padding: padding,
+        final bool isDisabled = onPressed == null;
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            boxShadow: isDisabled
+                ? []
+                : [
+                    BoxShadow(
+                      color: effectiveColor.withValues(alpha: 0.3),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
           ),
-          child: child,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onPressed,
+                  highlightColor: Colors.white.withValues(alpha: 0.1),
+                  splashColor: Colors.white.withValues(alpha: 0.2),
+                  child: Container(
+                    padding: padding,
+                    decoration: BoxDecoration(
+                      color: isDisabled
+                          ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                          : effectiveColor.withValues(alpha: 0.65), // Translucent fill
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: isDisabled ? 0.1 : 0.25),
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(radius),
+                      gradient: isDisabled
+                          ? null
+                          : LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.25),
+                                effectiveColor.withValues(alpha: 0.1),
+                                Colors.black.withValues(alpha: 0.15),
+                              ],
+                              stops: const [0.0, 0.4, 1.0],
+                            ),
+                    ),
+                    alignment: Alignment.center,
+                    child: child,
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
       case AuradoButtonVariant.outlined:
         return OutlinedButton(

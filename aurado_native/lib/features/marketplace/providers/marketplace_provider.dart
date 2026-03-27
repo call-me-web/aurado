@@ -24,6 +24,12 @@ class MarketplaceTenants extends _$MarketplaceTenants {
 }
 
 @riverpod
+FutureOr<List<TenantModel>> searchTenants(Ref ref, String query) {
+  if (query.isEmpty) return [];
+  return ref.watch(marketplaceRepositoryProvider).searchTenants(query);
+}
+
+@riverpod
 FutureOr<TenantModel?> tenant(Ref ref, String id) {
   return ref.watch(marketplaceRepositoryProvider).getTenantById(id);
 }
@@ -31,8 +37,11 @@ FutureOr<TenantModel?> tenant(Ref ref, String id) {
 @riverpod
 class DiscoveryCourses extends _$DiscoveryCourses {
   @override
-  FutureOr<List<DiscoveryCourseModel>> build({String? tenantId}) {
-    return ref.watch(marketplaceRepositoryProvider).getDiscoveryCourses(tenantId: tenantId);
+  FutureOr<List<DiscoveryCourseModel>> build({String? tenantId, String? category}) {
+    return ref.watch(marketplaceRepositoryProvider).getDiscoveryCourses(
+      tenantId: tenantId,
+      category: category,
+    );
   }
   
   Future<void> search(String query) async {
@@ -41,6 +50,13 @@ class DiscoveryCourses extends _$DiscoveryCourses {
       ref.read(marketplaceRepositoryProvider).getDiscoveryCourses(search: query)
     );
   }
+}
+
+@riverpod
+FutureOr<List<DiscoveryCourseModel>> featuredCourses(Ref ref) {
+  // Logic for "Smart" featured courses - for now, just fetch all and take first 5
+  // or apply a specific filter if the backend supports it.
+  return ref.watch(marketplaceRepositoryProvider).getDiscoveryCourses();
 }
 
 @riverpod

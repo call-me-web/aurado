@@ -101,11 +101,14 @@ class MarketplaceCourseCard extends ConsumerWidget {
               ? CachedNetworkImage(
                   imageUrl: course.thumbnailUrl!,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: colorScheme.surfaceContainerHighest,
-                    highlightColor: colorScheme.surface,
-                    child: Container(color: colorScheme.surface),
-                  ),
+                  placeholder: (context, url) {
+                    final isDark = colorScheme.brightness == Brightness.dark;
+                    return Shimmer.fromColors(
+                      baseColor: isDark ? colorScheme.surfaceContainerLow : colorScheme.surfaceContainerHighest,
+                      highlightColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLow,
+                      child: Container(color: Colors.white),
+                    );
+                  },
                   errorWidget: (context, url, error) => Container(
                     color: colorScheme.surfaceContainerHighest,
                     child: Center(
@@ -128,30 +131,8 @@ class MarketplaceCourseCard extends ConsumerWidget {
                   ),
                 ),
         ),
-        // Course Category Badge
-        if (course.courseCategory.isNotEmpty)
-          Positioned(
-            top: 12,
-            left: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(ThemeConfig.radiusSm),
-              ),
-              child: Text(
-                course.courseCategory.first,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
-          ),
         // Course Type Badge
-        if (course.courseType != null)
+        if (course.courseType != null && course.courseType!.isNotEmpty)
           Positioned(
             bottom: 12,
             right: 12,
@@ -176,8 +157,8 @@ class MarketplaceCourseCard extends ConsumerWidget {
                     course.courseType!.toUpperCase(),
                     style: TextStyle(
                       color: colorScheme.primary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
+                      fontSize: ThemeConfig.fontSizeXs,
+                      fontWeight: ThemeConfig.weightExtraBold,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -223,7 +204,7 @@ class MarketplaceCourseCard extends ConsumerWidget {
                 child: Text(
                   course.tenantName ?? 'Institution',
                   style: textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: ThemeConfig.weightSemiBold,
                     color: colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 1,
@@ -239,7 +220,7 @@ class MarketplaceCourseCard extends ConsumerWidget {
                   Text(
                     '4.8', // Placeholder logic for now
                     style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: ThemeConfig.weightExtraBold,
                       color: colorScheme.onSurface,
                     ),
                   ),
@@ -252,24 +233,51 @@ class MarketplaceCourseCard extends ConsumerWidget {
           Text(
             course.title,
             style: textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: ThemeConfig.cardTitleWeight,
               height: 1.3,
               letterSpacing: -0.2,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+
+          // Category Description
+          if (course.courseCategory.isNotEmpty) ...[
+            const Gap(4),
+            Text.rich(
+              TextSpan(
+                text: 'This comprehensive course is perfect for ',
+                children: [
+                  TextSpan(
+                    text: course.courseCategory.first,
+                    style: TextStyle(
+                      fontWeight: ThemeConfig.descriptionAccentWeight,
+                      color: ThemeConfig.textCategoryAccent,
+                    ),
+                  ),
+                ],
+              ),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: ThemeConfig.fontSizeXs,
+                fontStyle: FontStyle.italic,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+
           const Gap(12),
           // Metadata Row
           Wrap(
             spacing: 12,
             runSpacing: 4,
             children: [
-              if (course.level != null)
+              if (course.level != null && course.level!.isNotEmpty)
                 _buildMetaItem(Icons.bar_chart_rounded, course.level!, colorScheme, textTheme),
-              if (course.duration != null)
+              if (course.duration != null && course.duration!.isNotEmpty)
                 _buildMetaItem(Icons.access_time_rounded, course.duration!, colorScheme, textTheme),
-              if (course.language != null)
+              if (course.language != null && course.language!.isNotEmpty)
                 _buildMetaItem(Icons.language_rounded, course.language!, colorScheme, textTheme),
             ],
           ),
@@ -284,15 +292,15 @@ class MarketplaceCourseCard extends ConsumerWidget {
                   Text(
                     'Price',
                     style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: ThemeConfig.weightSemiBold,
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Text(
                     _formatPrice(),
                     style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: colorScheme.primary,
+                      fontWeight: ThemeConfig.weightBlack,
+                      color: ThemeConfig.textPrice,
                     ),
                   ),
                 ],
@@ -320,8 +328,8 @@ class MarketplaceCourseCard extends ConsumerWidget {
         Text(
           label,
           style: textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w500,
-            fontSize: 11,
+            fontWeight: ThemeConfig.cardMetaWeight,
+            fontSize: ThemeConfig.cardMetaSize,
             color: colorScheme.onSurfaceVariant,
           ),
         ),
